@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modern To-Do App</title>
+  <title>Modern To-Do App with Styled Checkbox</title>
   <style>
     /* General Reset */
     * {
@@ -109,6 +109,40 @@
       background-color: #d93636; /* Darker red on hover */
     }
 
+    /* Custom Checkbox Styling */
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      display: none; /* Hide the default checkbox */
+    }
+
+    .custom-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #00adb5; /* Accent color */
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .custom-checkbox.checked {
+      background-color: #00adb5; /* Accent color when checked */
+      border-color: #00adb5;
+    }
+
+    .custom-checkbox.checked::after {
+      content: '✔'; /* Checkmark */
+      color: #121212; /* Dark background for the checkmark */
+      font-size: 14px;
+    }
+
     /* Responsive Design */
     @media (max-width: 600px) {
       #todo-form input {
@@ -139,6 +173,77 @@
     const addBtn = document.getElementById('add-btn');
     const todoList = document.getElementById('todo-list');
 
+    // Load tasks from localStorage
+    const loadTasks = () => {
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      tasks.forEach(task => addTaskToDOM(task.text, task.completed));
+    };
+
+    // Save tasks to localStorage
+    const saveTasks = () => {
+      const tasks = [];
+      document.querySelectorAll('li').forEach(li => {
+        const checkbox = li.querySelector('.custom-checkbox');
+        tasks.push({
+          text: li.querySelector('span').textContent,
+          completed: checkbox.classList.contains('checked')
+        });
+      });
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    };
+
+    // Add a task to the DOM
+    const addTaskToDOM = (taskText, completed = false) => {
+      const li = document.createElement('li');
+
+      // Create checkbox container
+      const checkboxContainer = document.createElement('label');
+      checkboxContainer.classList.add('checkbox-container');
+
+      // Create custom checkbox
+      const customCheckbox = document.createElement('div');
+      customCheckbox.classList.add('custom-checkbox');
+      if (completed) {
+        customCheckbox.classList.add('checked');
+        li.classList.add('completed');
+      }
+
+      // Create hidden checkbox input
+      const checkboxInput = document.createElement('input');
+      checkboxInput.type = 'checkbox';
+      checkboxInput.checked = completed;
+      checkboxInput.addEventListener('change', () => {
+        customCheckbox.classList.toggle('checked');
+        li.classList.toggle('completed');
+        saveTasks();
+      });
+
+      // Append checkbox input and custom checkbox to container
+      checkboxContainer.appendChild(checkboxInput);
+      checkboxContainer.appendChild(customCheckbox);
+
+      // Create task text
+      const span = document.createElement('span');
+      span.textContent = taskText;
+
+      // Add delete button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.classList.add('delete-btn');
+      deleteBtn.addEventListener('click', () => {
+        li.remove();
+        saveTasks();
+      });
+
+      // Append elements to the list item
+      li.appendChild(checkboxContainer);
+      li.appendChild(span);
+      li.appendChild(deleteBtn);
+
+      // Append the list item to the list
+      todoList.appendChild(li);
+    };
+
     // Add a new task
     addBtn.addEventListener('click', () => {
       const taskText = todoInput.value.trim();
@@ -147,30 +252,15 @@
         return;
       }
 
-      // Create a new list item
-      const li = document.createElement('li');
-      li.textContent = taskText;
-
-      // Add a "Complete" toggle
-      li.addEventListener('click', () => {
-        li.classList.toggle('completed');
-      });
-
-      // Add a delete button
-      const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = 'Delete';
-      deleteBtn.classList.add('delete-btn');
-      deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent triggering the "Complete" toggle
-        li.remove();
-      });
-
-      li.appendChild(deleteBtn);
-      todoList.appendChild(li);
+      addTaskToDOM(taskText);
+      saveTasks();
 
       // Clear the input field
       todoInput.value = '';
     });
+
+    // Load tasks on page load
+    loadTasks();
   </script>
 </body>
 </html>
