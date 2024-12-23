@@ -60,8 +60,6 @@
     /* Animation for task removal */
     .fade-out { opacity: 0; visibility: hidden; transition: opacity 10s ease-out, visibility 0s 10s; }
     .completed-task { background-color: #1d2d22; }
-
-
 .no-tasks-message {
   color:fff;
   display: flex;
@@ -79,6 +77,19 @@
   font-size: 20px;
 }
 
+/* Caution message style */
+.caution-message {
+  color: #ffcc00;
+  background-color: #2c2c2e;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  font-size: 1rem;
+  border: 1px solid #ffaa00;
+  text-align: center;
+  font-weight: bold;
+  line-height: 1.5;
+}
 
   </style>
 </head>
@@ -86,8 +97,8 @@
   <h1>Modern To-Do App</h1>
   <div id="export-import-sort-container">
     <div id="export-import-buttons">
-      <button id="export-btn"><i class="fas fa-download"></i> Export</button>
-      <button id="import-btn"><i class="fas fa-upload"></i> Import</button>
+      <button id="export-btn"><i class="fas fa-hdd"></i> Backup</button>
+      <button id="import-btn"><i class="fas fa-sync"></i> Restore</button>
       <button id="completed-btn">Show Completed</button> 
     </div>
   </div>
@@ -119,14 +130,19 @@
     </div>
   </div>
 
-  <!-- Modal for Importing Tasks -->
-  <div id="import-modal">
-    <textarea id="import-textarea" placeholder="Paste your JSON here"></textarea>
-    <div id="modal-options">
-      <button id="import-save-btn">Save</button>
-      <button id="import-cancel-btn">Cancel</button>
-    </div>
+<!-- Modal for Importing Tasks -->
+<div id="import-modal">
+  <!-- Caution message -->
+  <p class="caution-message">
+    Caution: Do not press this button unless you have pasted a valid key. The restore process first cleans the database and then restores your data. So, a bad key will result in data loss. After restoring, restart the app to see the changes.
+  </p>
+  <textarea id="import-textarea" placeholder="Paste your JSON here"></textarea>
+  <div id="modal-options">
+    <button id="import-save-btn">Clear Present Data &  Restore</button>
+    <button id="import-cancel-btn">Cancel</button>
   </div>
+</div>
+
 
   <!-- Overlay for Modals -->
   <div id="modal-overlay"></div>
@@ -373,7 +389,6 @@ importCancelBtn.addEventListener('click', () => {
 
 // Initial render
 renderTasks();
-
 
   </script>
 </body>
