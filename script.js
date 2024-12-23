@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 let todos = JSON.parse(localStorage.getItem('todos')) || [];
 let editedTaskId = null;
 let showCompleted = false;  // Track whether we're showing completed tasks
@@ -243,3 +244,6 @@ importCancelBtn.addEventListener('click', () => {
 
 // Initial render
 renderTasks();
+=======
+
+>>>>>>> a1ab83329d8d85d2555176d49ba5fd9bb0161dc8
