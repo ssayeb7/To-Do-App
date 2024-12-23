@@ -191,16 +191,16 @@ function renderTasks(filterCompleted = null) {
   });
 }
 
-// Show only completed tasks or all tasks
+// Show only todo tasks
 document.getElementById('completed-btn').addEventListener('click', function () {
   const isShowingCompleted = this.innerText === 'Show Completed';
 
   if (isShowingCompleted) {
-    this.innerText = 'Show All'; // Change button text when showing only completed tasks
+    this.innerText = 'Show Todo'; // Change button text when showing completed tasks
     renderTasks(true); // Show only completed tasks
   } else {
     this.innerText = 'Show Completed'; // Reset to show completed text
-    renderTasks(); // Show all tasks
+    renderTasks(false); // Show only todo tasks
   }
 });
 
@@ -227,7 +227,7 @@ todoForm.addEventListener('submit', (e) => {
     todos.push(newTask);
     localStorage.setItem('todos', JSON.stringify(todos));
     todoInput.value = '';
-    renderTasks();
+    renderTasks(false); // Show only todo tasks
   }
 });
 
@@ -307,8 +307,8 @@ importCancelBtn.addEventListener('click', () => {
 // Add event listener for sorting
 sortBySelect.addEventListener('change', sortTasks);
 
-// Render tasks on initial load
-renderTasks();
+// Render tasks on initial load (only show todos by default)
+renderTasks(false);
 
 
   </script>
