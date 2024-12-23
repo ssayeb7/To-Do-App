@@ -60,6 +60,26 @@
     /* Animation for task removal */
     .fade-out { opacity: 0; visibility: hidden; transition: opacity 10s ease-out, visibility 0s 10s; }
     .completed-task { background-color: #1d2d22; }
+
+
+.no-tasks-message {
+  color:fff;
+  display: flex;
+  justify-content: center;
+  background-color: #007aff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 20px;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.no-tasks-message i {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+
   </style>
 </head>
 <body>
@@ -152,87 +172,101 @@ function renderTasks() {
     filteredTodos = todos.filter(task => task.completed === showCompleted);
   }
 
-  filteredTodos.forEach((task) => {
-    const li = document.createElement('li');
-    li.classList.toggle('completed', task.completed); // Update the list item's class based on completion
+  // If no tasks are present for the filtered category, show a message
+  if (filteredTodos.length === 0) {
+    const noTasksMessage = document.createElement('div');
+    noTasksMessage.classList.add('no-tasks-message');
+    const icon = document.createElement('i');
+    icon.classList.add('fas', showCompleted ? 'fa-sad-tear' : 'fa-list-ul');
+    const text = document.createElement('span');
+    text.innerText = showCompleted ? "You didn't complete any tasks yet." : "Make a todo to get started!";
 
-    // Add background color for completed tasks
-    if (task.completed) {
-      li.classList.add('completed-task'); // Light green background for completed tasks
-    }
+    noTasksMessage.appendChild(icon);
+    noTasksMessage.appendChild(text);
+    todoList.appendChild(noTasksMessage);
+  } else {
+    filteredTodos.forEach((task) => {
+      const li = document.createElement('li');
+      li.classList.toggle('completed', task.completed); // Update the list item's class based on completion
 
-    const checkboxContainer = document.createElement('div');
-    checkboxContainer.classList.add('checkbox-container');
-    
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = `checkbox-${task.id}`;
-    checkbox.checked = task.completed; // Sync the checkbox with task completion status
-    checkbox.classList.add('checkbox-input'); // Add a class for styling purposes
-    
-    const customCheckbox = document.createElement('div');
-    customCheckbox.classList.add('custom-checkbox');
-    if (task.completed) customCheckbox.classList.add('checked'); // Add checked class if completed
+      // Add background color for completed tasks
+      if (task.completed) {
+        li.classList.add('completed-task'); // Light green background for completed tasks
+      }
 
-    // Label to make checkbox clickable
-    const label = document.createElement('label');
-    label.setAttribute('for', checkbox.id); // Link label to checkbox
-    label.appendChild(checkbox);
-    label.appendChild(customCheckbox);
+      const checkboxContainer = document.createElement('div');
+      checkboxContainer.classList.add('checkbox-container');
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = `checkbox-${task.id}`;
+      checkbox.checked = task.completed; // Sync the checkbox with task completion status
+      checkbox.classList.add('checkbox-input'); // Add a class for styling purposes
+      
+      const customCheckbox = document.createElement('div');
+      customCheckbox.classList.add('custom-checkbox');
+      if (task.completed) customCheckbox.classList.add('checked'); // Add checked class if completed
 
-    checkboxContainer.appendChild(label);
+      // Label to make checkbox clickable
+      const label = document.createElement('label');
+      label.setAttribute('for', checkbox.id); // Link label to checkbox
+      label.appendChild(checkbox);
+      label.appendChild(customCheckbox);
 
-    const taskContent = document.createElement('div');
-    taskContent.classList.add('task-content');
-    const taskText = document.createElement('span');
-    taskText.innerText = task.text || 'Untitled'; // Fallback for text if missing
-    taskContent.appendChild(taskText);
+      checkboxContainer.appendChild(label);
 
-    const actionButtons = document.createElement('div');
-    actionButtons.classList.add('action-buttons');
-    const editBtn = document.createElement('button');
-    editBtn.innerText = 'Edit';
-    editBtn.classList.add('edit-btn');
-    const deleteBtn = document.createElement('button');
-    deleteBtn.innerText = 'Delete';
-    deleteBtn.classList.add('delete-btn');
-    actionButtons.appendChild(editBtn);
-    actionButtons.appendChild(deleteBtn);
+      const taskContent = document.createElement('div');
+      taskContent.classList.add('task-content');
+      const taskText = document.createElement('span');
+      taskText.innerText = task.text || 'Untitled'; // Fallback for text if missing
+      taskContent.appendChild(taskText);
 
-    li.appendChild(checkboxContainer);
-    li.appendChild(taskContent);
-    li.appendChild(actionButtons);
-    todoList.appendChild(li);
+      const actionButtons = document.createElement('div');
+      actionButtons.classList.add('action-buttons');
+      const editBtn = document.createElement('button');
+      editBtn.innerText = 'Edit';
+      editBtn.classList.add('edit-btn');
+      const deleteBtn = document.createElement('button');
+      deleteBtn.innerText = 'Delete';
+      deleteBtn.classList.add('delete-btn');
+      actionButtons.appendChild(editBtn);
+      actionButtons.appendChild(deleteBtn);
 
-    // Edit task functionality
-    editBtn.addEventListener('click', () => {
-      editedTaskId = task.id;
-      editTaskInput.value = task.text;
-      editModal.style.display = 'block';
-      modalOverlay.style.display = 'block';
+      li.appendChild(checkboxContainer);
+      li.appendChild(taskContent);
+      li.appendChild(actionButtons);
+      todoList.appendChild(li);
+
+      // Edit task functionality
+      editBtn.addEventListener('click', () => {
+        editedTaskId = task.id;
+        editTaskInput.value = task.text;
+        editModal.style.display = 'block';
+        modalOverlay.style.display = 'block';
+      });
+
+      // Delete task functionality
+      deleteBtn.addEventListener('click', () => {
+        editedTaskId = task.id;
+        confirmDeleteModal.style.display = 'block';
+        modalOverlay.style.display = 'block';
+      });
+
+      // Toggle task completion on checkbox change
+      checkbox.addEventListener('change', () => {
+        task.completed = checkbox.checked; // Update task's completed state
+
+        // Update the visual state of the custom checkbox
+        customCheckbox.classList.toggle('checked', checkbox.checked);
+
+        // Update the todos array and save to localStorage
+        todos = todos.map(t => t.id === task.id ? { ...t, completed: task.completed } : t);
+        localStorage.setItem('todos', JSON.stringify(todos));
+
+        renderTasks(); // Re-render tasks to update the task lists
+      });
     });
-
-    // Delete task functionality
-    deleteBtn.addEventListener('click', () => {
-      editedTaskId = task.id;
-      confirmDeleteModal.style.display = 'block';
-      modalOverlay.style.display = 'block';
-    });
-
-    // Toggle task completion on checkbox change
-    checkbox.addEventListener('change', () => {
-      task.completed = checkbox.checked; // Update task's completed state
-
-      // Update the visual state of the custom checkbox
-      customCheckbox.classList.toggle('checked', checkbox.checked);
-
-      // Update the todos array and save to localStorage
-      todos = todos.map(t => t.id === task.id ? { ...t, completed: task.completed } : t);
-      localStorage.setItem('todos', JSON.stringify(todos));
-
-      renderTasks(); // Re-render tasks to update the task lists
-    });
-  });
+  }
 }
 
 // Show only completed tasks or only todo tasks
@@ -339,6 +373,7 @@ importCancelBtn.addEventListener('click', () => {
 
 // Initial render
 renderTasks();
+
 
   </script>
 </body>
