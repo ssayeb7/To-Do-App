@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modern To-Do App with Styled Checkbox</title>
+  <title>Modern To-Do App</title>
   <style>
     /* General Reset */
     * {
@@ -91,25 +91,14 @@
     }
 
     li.completed {
+      order: 1; /* Push completed items to the bottom */
+    }
+
+    li.completed span {
       text-decoration: line-through;
       color: #888888; /* Faded text for completed tasks */
     }
 
-    .delete-btn {
-      background-color: #ff4c4c; /* Red delete button */
-      color: #ffffff;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
-    }
-
-    .delete-btn:hover {
-      background-color: #d93636; /* Darker red on hover */
-    }
-
-    /* Custom Checkbox Styling */
     .checkbox-container {
       display: flex;
       align-items: center;
@@ -143,19 +132,121 @@
       font-size: 14px;
     }
 
-    /* Responsive Design */
-    @media (max-width: 600px) {
-      #todo-form input {
-        font-size: 0.9rem;
-      }
+    .task-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
 
-      #todo-form button {
-        font-size: 0.9rem;
-      }
+    .task-content span {
+      margin-left: 10px;
+    }
 
-      li {
-        padding: 10px;
-      }
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .edit-btn, .delete-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .edit-btn {
+      background-color: #00adb5; /* Accent color for edit */
+      color: #ffffff;
+    }
+
+    .edit-btn:hover {
+      background-color: #007b7f; /* Darker accent on hover */
+    }
+
+    .delete-btn {
+      background-color: #ff4c4c; /* Red delete button */
+      color: #ffffff;
+    }
+
+    .delete-btn:hover {
+      background-color: #d93636; /* Darker red on hover */
+    }
+
+    /* Modal Styling */
+    #edit-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #1e1e1e;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 1000;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    #edit-modal textarea,
+    #edit-modal input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #292929;
+      color: #ffffff;
+      resize: none;
+      font-size: 1rem;
+    }
+
+    #edit-modal button {
+      padding: 15px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #00adb5;
+      color: #ffffff;
+      transition: background-color 0.3s ease;
+      font-size: 1rem;
+    }
+
+    #edit-modal button:hover {
+      background-color: #007b7f;
+    }
+
+    #modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: none;
+      z-index: 999;
+    }
+
+    #modal-options {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    #cancel-edit-btn {
+      padding: 15px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #ff4c4c;
+      color: #ffffff;
+      transition: background-color 0.3s ease;
+      font-size: 1rem;
+    }
+
+    #cancel-edit-btn:hover {
+      background-color: #d93636;
     }
   </style>
 </head>
@@ -167,11 +258,30 @@
   </div>
   <ul id="todo-list"></ul>
 
+  <!-- Modal for Editing -->
+  <div id="modal-overlay"></div>
+  <div id="edit-modal">
+    <textarea id="edit-textarea" style="display: none;"></textarea>
+    <input type="text" id="edit-input" />
+    <div id="modal-options">
+      <button id="save-edit-btn">Save</button>
+      <button id="cancel-edit-btn">Cancel</button>
+    </div>
+  </div>
+
   <script>
     // Select elements
     const todoInput = document.getElementById('todo-input');
     const addBtn = document.getElementById('add-btn');
     const todoList = document.getElementById('todo-list');
+    const editModal = document.getElementById('edit-modal');
+    const editInput = document.getElementById('edit-input');
+    const editTextarea = document.getElementById('edit-textarea');
+    const saveEditBtn = document.getElementById('save-edit-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    const modalOverlay = document.getElementById('modal-overlay');
+
+    let currentEditLi = null;
 
     // Load tasks from localStorage
     const loadTasks = () => {
@@ -196,6 +306,14 @@
     const addTaskToDOM = (taskText, completed = false) => {
       const li = document.createElement('li');
 
+      if (completed) {
+        li.classList.add('completed');
+      }
+
+      // Create task content
+      const taskContent = document.createElement('div');
+      taskContent.classList.add('task-content');
+
       // Create checkbox container
       const checkboxContainer = document.createElement('label');
       checkboxContainer.classList.add('checkbox-container');
@@ -205,7 +323,6 @@
       customCheckbox.classList.add('custom-checkbox');
       if (completed) {
         customCheckbox.classList.add('checked');
-        li.classList.add('completed');
       }
 
       // Create hidden checkbox input
@@ -215,6 +332,7 @@
       checkboxInput.addEventListener('change', () => {
         customCheckbox.classList.toggle('checked');
         li.classList.toggle('completed');
+        reorderTasks();
         saveTasks();
       });
 
@@ -226,6 +344,33 @@
       const span = document.createElement('span');
       span.textContent = taskText;
 
+      // Append checkbox and text to task content
+      taskContent.appendChild(checkboxContainer);
+      taskContent.appendChild(span);
+
+      // Create action buttons
+      const actionButtons = document.createElement('div');
+      actionButtons.classList.add('action-buttons');
+
+      // Add edit button
+      const editBtn = document.createElement('button');
+      editBtn.textContent = 'Edit';
+      editBtn.classList.add('edit-btn');
+      editBtn.addEventListener('click', () => {
+        currentEditLi = li;
+        if (span.textContent.length > 50) {
+          editTextarea.style.display = 'block';
+          editInput.style.display = 'none';
+          editTextarea.value = span.textContent;
+        } else {
+          editTextarea.style.display = 'none';
+          editInput.style.display = 'block';
+          editInput.value = span.textContent;
+        }
+        editModal.style.display = 'block';
+        modalOverlay.style.display = 'block';
+      });
+
       // Add delete button
       const deleteBtn = document.createElement('button');
       deleteBtn.textContent = 'Delete';
@@ -235,32 +380,63 @@
         saveTasks();
       });
 
-      // Append elements to the list item
-      li.appendChild(checkboxContainer);
-      li.appendChild(span);
-      li.appendChild(deleteBtn);
+            // Append buttons to action buttons container
+      actionButtons.appendChild(editBtn);
+      actionButtons.appendChild(deleteBtn);
 
-      // Append the list item to the list
+      // Append content and action buttons to list item
+      li.appendChild(taskContent);
+      li.appendChild(actionButtons);
+
+      // Append list item to the task list
       todoList.appendChild(li);
     };
 
-    // Add a new task
+    // Reorder tasks based on their completion status
+    const reorderTasks = () => {
+      const tasks = Array.from(todoList.children);
+      tasks.sort((a, b) => {
+        return a.classList.contains('completed') - b.classList.contains('completed');
+      });
+      tasks.forEach(task => todoList.appendChild(task));
+    };
+
+    // Add new task
     addBtn.addEventListener('click', () => {
       const taskText = todoInput.value.trim();
-      if (taskText === '') {
+      if (!taskText) {
         alert('Please enter a task!');
         return;
       }
-
       addTaskToDOM(taskText);
-      saveTasks();
-
-      // Clear the input field
       todoInput.value = '';
+      saveTasks();
+    });
+
+    // Save edit changes
+    saveEditBtn.addEventListener('click', () => {
+      if (!currentEditLi) return;
+      const newText = editTextarea.style.display === 'block' ? editTextarea.value : editInput.value;
+      currentEditLi.querySelector('span').textContent = newText;
+      editModal.style.display = 'none';
+      modalOverlay.style.display = 'none';
+      saveTasks();
+    });
+
+    // Cancel edit changes
+    cancelEditBtn.addEventListener('click', () => {
+      editModal.style.display = 'none';
+      modalOverlay.style.display = 'none';
     });
 
     // Load tasks on page load
     loadTasks();
+
+    // Close modal on clicking overlay
+    modalOverlay.addEventListener('click', () => {
+      editModal.style.display = 'none';
+      modalOverlay.style.display = 'none';
+    });
   </script>
 </body>
 </html>
