@@ -14,8 +14,8 @@
 
     body {
       font-family: 'Arial', sans-serif;
-      background-color: #f0f0f0; /* Light mode background */
-      color: #333333; /* Dark text for light mode */
+      background-color: #1c1c1e; /* Dark mode background */
+      color: #f5f5f5; /* Light text for dark mode */
       margin: 0;
       padding: 20px;
       display: flex;
@@ -43,12 +43,12 @@
       flex: 1;
       padding: 12px 15px;
       font-size: 1rem;
-      border: 1px solid #cccccc;
+      border: 1px solid #3a3a3c;
       border-radius: 10px;
       outline: none;
-      background-color: #ffffff;
-      color: #333333;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background-color: #2c2c2e;
+      color: #f5f5f5;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     #todo-form button {
@@ -61,7 +61,7 @@
       background-color: #007aff;
       color: #ffffff;
       transition: background-color 0.3s ease;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     #todo-form button:hover {
@@ -81,20 +81,20 @@
       align-items: center;
       padding: 15px;
       margin-bottom: 10px;
-      background-color: #ffffff;
+      background-color: #2c2c2e;
       border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
       transition: transform 0.2s ease, background-color 0.3s ease;
     }
 
     li:hover {
       transform: scale(1.02);
-      background-color: #f9f9f9;
+      background-color: #3a3a3c;
     }
 
     li.completed span {
       text-decoration: line-through;
-      color: #999999;
+      color: #8e8e93;
     }
 
     .checkbox-container {
@@ -108,8 +108,8 @@
     }
 
     .custom-checkbox {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       border: 2px solid #007aff;
       border-radius: 4px;
       display: flex;
@@ -156,12 +156,12 @@
     }
 
     .edit-btn {
-      background-color: #007aff;
+      background-color: #34c759;
       color: #ffffff;
     }
 
     .edit-btn:hover {
-      background-color: #005bb5;
+      background-color: #28a745;
     }
 
     .delete-btn {
@@ -179,10 +179,10 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: #ffffff;
+      background-color: #2c2c2e;
       padding: 30px;
       border-radius: 15px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
       display: none;
       z-index: 1000;
       width: 90%;
@@ -194,10 +194,10 @@
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
-      border: 1px solid #cccccc;
+      border: 1px solid #3a3a3c;
       border-radius: 10px;
-      background-color: #f9f9f9;
-      color: #333333;
+      background-color: #1c1c1e;
+      color: #f5f5f5;
       font-size: 1rem;
     }
 
@@ -206,28 +206,41 @@
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      background-color: #007aff;
-      color: #ffffff;
-      transition: background-color 0.3s ease;
       font-size: 1rem;
-    }
-
-    #edit-modal button:hover, #confirm-delete-modal button:hover {
-      background-color: #005bb5;
     }
 
     #modal-options {
       display: flex;
       justify-content: space-between;
+      gap: 10px;
       margin-top: 10px;
+    }
+
+    #save-edit-btn {
+      background-color: #34c759;
+      color: #ffffff;
+    }
+
+    #save-edit-btn:hover {
+      background-color: #28a745;
     }
 
     #cancel-edit-btn, #cancel-delete-btn {
       background-color: #ff3b30;
+      color: #ffffff;
     }
 
     #cancel-edit-btn:hover, #cancel-delete-btn:hover {
       background-color: #c12a23;
+    }
+
+    #confirm-delete-btn {
+      background-color: #ffcc00;
+      color: #000000;
+    }
+
+    #confirm-delete-btn:hover {
+      background-color: #e6b800;
     }
 
     #modal-overlay {
@@ -236,7 +249,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.7);
       display: none;
       z-index: 999;
     }
@@ -253,7 +266,7 @@
   <!-- Modal for Editing -->
   <div id="modal-overlay"></div>
   <div id="edit-modal">
-    <input type="text" id="edit-input" />
+    <input type="text" id="edit-input" placeholder="Edit your task..." />
     <div id="modal-options">
       <button id="save-edit-btn">Save</button>
       <button id="cancel-edit-btn">Cancel</button>
@@ -274,65 +287,66 @@
     const addBtn = document.getElementById('add-btn');
     const todoList = document.getElementById('todo-list');
     const editModal = document.getElementById('edit-modal');
-const confirmDeleteModal = document.getElementById('confirm-delete-modal');
-const modalOverlay = document.getElementById('modal-overlay');
-const editInput = document.getElementById('edit-input');
-const saveEditBtn = document.getElementById('save-edit-btn');
-const cancelEditBtn = document.getElementById('cancel-edit-btn');
-const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    const confirmDeleteModal = document.getElementById('confirm-delete-modal');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const editInput = document.getElementById('edit-input');
+    const saveEditBtn = document.getElementById('save-edit-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
 
-let todos = JSON.parse(localStorage.getItem('todos')) || [];
-let currentEditIndex = null;
+    let todos = JSON.parse(localStorage.getItem('todos')) || [];
+    let currentEditIndex = null;
 
-function renderTodos() {
-  todoList.innerHTML = '';
-  todos.forEach((todo, index) => {
-    const li = document.createElement('li');
-    li.className = todo.completed ? 'completed' : '';
-    li.innerHTML = `
-      <div class="checkbox-container">
-        <div class="custom-checkbox ${todo.completed ? 'checked' : ''}" data-index="${index}"></div>
-        <span>${todo.task}</span>
-      </div>
-      <div class="action-buttons">
-        <button class="edit-btn" data-index="${index}">Edit</button>
-        <button class="delete-btn" data-index="${index}">Delete</button>
-      </div>
-    `;
-    todoList.appendChild(li);
-  });
-}
+    function renderTodos() {
+      todoList.innerHTML = '';
+      todos.forEach((todo, index) => {
+        const li = document.createElement('li');
+        li.className = todo.completed ? 'completed' : '';
+        li.innerHTML = `
+          <div class="checkbox-container">
+            <div class="custom-checkbox ${todo.completed ? 'checked' : ''}" data-index="${index}"></div>
+            <span>${todo.task}</span>
+          </div>
+          <div class="action-buttons">
+            <button class="edit-btn" data-index="${index}">Edit</button>
+            <button class="delete-btn" data-index="${index}">Delete</button>
+          </div>
+        `;
+        todoList.appendChild(li);
+      });
+    }
 
-function saveTodos() {
-  localStorage.setItem('todos', JSON.stringify(todos));
-}
+    function saveTodos() {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
 
-function toggleModal(modal, show) {
-  modal.style.display = show ? 'block' : 'none';
-  modalOverlay.style.display = show ? 'block' : 'none';
-}
+    function toggleModal(modal, show) {
+      modal.style.display = show ? 'block' : 'none';
+      modalOverlay.style.display = show ? 'block' : 'none';
+    }
 
-// Add Task
-addBtn.addEventListener('click', () => {
-  const task = todoInput.value.trim();
-  if (task) {
-    todos.push({ task, completed: false });
-    saveTodos();
-    renderTodos();
-    todoInput.value = '';
-  }
-});
+    // Add Task
+    addBtn.addEventListener('click', () => {
+      const task = todoInput.value.trim();
+      if (task) {
+        todos.push({ task, completed: false });
+        saveTodos();
+        renderTodos();
+        todoInput.value = '';
+      }
+    });
 
-// Toggle Completion
-todoList.addEventListener('click', (e) => {
-  if (e.target.classList.contains('custom-checkbox')) {
-    const index = e.target.dataset.index;
-    todos[index].completed = !todos[index].completed;
-    saveTodos();
-    renderTodos();
-  }
-});
+    // Toggle Completion
+    todoList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('custom-checkbox')) {
+        const index = e.target.dataset.index;
+        todos[index].completed = !todos[index].completed;
+        saveTodos();
+        renderTodos();
+      }
+    });
+
 
 // Edit Task
 todoList.addEventListener('click', (e) => {
