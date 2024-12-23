@@ -91,6 +91,49 @@
   line-height: 1.5;
 }
 
+/* Style for the error alert */
+.error-message {
+  background-color: rgba(248, 215, 218, 0.9); /* Slightly transparent for blur effect */
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  display: none; /* Hidden by default */
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  margin: 20px auto;
+  box-sizing: border-box;
+  
+  /* Z-index to ensure it's above other content */
+  position: fixed; /* Fixes the error message in the viewport */
+  top: 10%; /* You can adjust this value to control vertical positioning */
+  left: 50%; /* Centers the message horizontally */
+  transform: translateX(-50%); /* Ensures perfect centering */
+  z-index: 9999; /* Ensures it appears above all other elements */
+
+  /* Fade-out transition */
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
+/* Style for error message when it's visible */
+.error-message.show {
+  display: block;
+  opacity: 1;
+}
+
+/* Style for error message when it's hidden */
+.error-message.hide {
+  opacity: 0;
+  display: none;
+}
+
+
+
+
   </style>
 </head>
 <body>
@@ -134,13 +177,17 @@
 <div id="import-modal">
   <!-- Caution message -->
   <p class="caution-message">
-    Caution: Do not press this button unless you have pasted a valid key. The restore process first cleans the database and then restores your data. So, a bad key will result in data loss. After restoring, restart the app to see the changes.
+    Caution: Do not press this button unless you have pasted a valid key. The restore process first cleans the database and then restores your data. So, a bad key will result in data loss.
   </p>
   <textarea id="import-textarea" placeholder="Paste your JSON here"></textarea>
   <div id="modal-options">
     <button id="import-save-btn">Clear Present Data &  Restore</button>
     <button id="import-cancel-btn">Cancel</button>
   </div>
+</div>
+<!-- Error Message -->
+<div id="error-message" class="error-message">
+  Invalid JSON format! Please try again.
 </div>
 
 
@@ -365,6 +412,7 @@ importBtn.addEventListener('click', () => {
 
 // Save imported tasks
 importSaveBtn.addEventListener('click', () => {
+  const errorMessage = document.getElementById('error-message');
   try {
     const importedTasks = JSON.parse(importTextarea.value);
     if (Array.isArray(importedTasks)) {
@@ -373,11 +421,17 @@ importSaveBtn.addEventListener('click', () => {
       renderTasks();
       importModal.style.display = 'none';
       modalOverlay.style.display = 'none';
+      errorMessage.classList.remove('show');  // Hide error message if input is valid
     } else {
-      alert('Invalid JSON format!');
+      throw new Error('Invalid format');
     }
   } catch (e) {
-    alert('Invalid JSON format!');
+    errorMessage.classList.add('show');  // Show error message if JSON is invalid
+
+    // Automatically hide the error message after 5 seconds
+    setTimeout(() => {
+      errorMessage.classList.remove('show');  // Hide error message
+    }, 1500);  // 1.5 seconds delay
   }
 });
 
