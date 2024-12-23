@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern To-Do App</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <body>
+        <h1>
+            <a href="https://github.com/SayfullahSayeb/To-Do-App" target="_blank" title="View on GitHub">
+              <i class="fab fa-github"></i>
+              Modern To-Do App
+            </a>
+          </h1>
+        <div id="export-import-sort-container">
+          <div id="export-import-buttons">
+            <button id="export-btn"><i class="fas fa-hdd"></i> Backup</button>
+            <button id="import-btn"><i class="fas fa-sync"></i> Restore</button>
+            <button id="completed-btn">Show Completed</button> 
+          </div>
+        </div>
+      
+        <!-- To-Do Form -->
+        <form id="todo-form">
+          <input type="text" id="todo-input" placeholder="Add a new task" />
+          <button type="submit">Add</button>
+        </form>
+      
+        <!-- Task List -->
+        <ul id="todo-list"></ul>
+      
+        <!-- Modal for Editing Task -->
+        <div id="edit-modal">
+          <textarea id="edit-task-input"></textarea>
+          <div id="modal-options">
+            <button id="save-edit-btn">Save</button>
+            <button id="cancel-edit-btn">Cancel</button>
+          </div>
+        </div>
+      
+        <!-- Modal for Deleting Task -->
+        <div id="confirm-delete-modal">
+          <p>Are you sure you want to delete this task?</p>
+          <div id="modal-options">
+            <button id="confirm-delete-btn">Yes</button>
+            <button id="cancel-delete-btn">No</button>
+          </div>
+        </div>
+      
+      <!-- Modal for Importing Tasks -->
+      <div id="import-modal">
+        <!-- Caution message -->
+        <p class="caution-message">
+          Caution: Do not press this button unless you have pasted a valid key. The restore process first cleans the database and then restores your data. So, a bad key will result in data loss.
+        </p>
+        <textarea id="import-textarea" placeholder="Paste your JSON here"></textarea>
+        <div id="modal-options">
+          <button id="import-save-btn">Clear Present Data &  Restore</button>
+          <button id="import-cancel-btn">Cancel</button>
+        </div>
+      </div>
+      <!-- Error Message -->
+      <div id="error-message" class="error-message">
+        Invalid JSON format! Please try again.
+      </div>
+      
+      
+        <!-- Overlay for Modals -->
+        <div id="modal-overlay"></div>
+      
+        <!-- Notification for Task Export -->
+        <div class="notification" id="notification">Task Exported Successfully!</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
