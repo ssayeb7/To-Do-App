@@ -253,27 +253,128 @@
       display: none;
       z-index: 999;
     }
+
+#export-import-buttons {
+  margin-bottom: 20px;
+}
+
+#export-import-buttons button {
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: #007aff;
+  color: #ffffff;
+  margin: 5px;
+  transition: background-color 0.3s ease;
+}
+
+#export-import-buttons button:hover {
+  background-color: #005bb5;
+}
+
+/* Modal for Import */
+#import-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #2c2c2e;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 1000;
+  width: 90%;
+  max-width: 400px;
+}
+
+#import-modal textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #3a3a3c;
+  border-radius: 10px;
+  background-color: #1c1c1e;
+  color: #f5f5f5;
+  font-size: 14px;
+  min-height: 100px;
+}
+
+#import-modal button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+#import-modal #import-save-btn {
+  background-color: #34c759;
+  color: #ffffff;
+}
+
+#import-modal #import-save-btn:hover {
+  background-color: #28a745;
+}
+
+#import-modal #import-cancel-btn {
+  background-color: #ff3b30;
+  color: #ffffff;
+}
+
+#import-modal #import-cancel-btn:hover {
+  background-color: #c12a23;
+}
+
+
+/* Notification Styles */
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #34c759; /* Green background */
+  color: #ffffff;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: none;
+  z-index: 1001;
+  max-width: 80%;
+  min-width: 250px;
+  text-align: center;
+  transition: opacity 0.3s ease-in-out;
+}
   </style>
 </head>
 <body>
   <h1>Modern To-Do App</h1>
-  <div id="todo-form">
-    <input type="text" id="todo-input" placeholder="Enter a new task..." />
-    <button id="add-btn">Add</button>
+
+  <div id="export-import-buttons">
+    <button id="export-btn">Export</button>
+    <button id="import-btn">Import</button>
   </div>
+
+  <form id="todo-form">
+    <input type="text" id="todo-input" placeholder="Add a new task" />
+    <button type="submit">Add</button>
+  </form>
+
   <ul id="todo-list"></ul>
 
-  <!-- Modal for Editing -->
-  <div id="modal-overlay"></div>
+  <!-- Modal for Editing Task -->
   <div id="edit-modal">
-    <input type="text" id="edit-input" placeholder="Edit your task..." />
+    <textarea id="edit-task-input"></textarea>
     <div id="modal-options">
       <button id="save-edit-btn">Save</button>
       <button id="cancel-edit-btn">Cancel</button>
     </div>
   </div>
 
-  <!-- Modal for Delete Confirmation -->
+  <!-- Modal for Deleting Task -->
   <div id="confirm-delete-modal">
     <p>Are you sure you want to delete this task?</p>
     <div id="modal-options">
@@ -282,116 +383,227 @@
     </div>
   </div>
 
+<select id="sort-by-select">
+  <option value="date">Sort by Date</option>
+  <option value="completion">Sort by Completion</option>
+</select>
+
+
+  <!-- Modal for Importing Task -->
+  <div id="import-modal">
+    <textarea id="import-textarea" placeholder="Paste your JSON here"></textarea>
+    <div id="modal-options">
+      <button id="import-save-btn">Save</button>
+      <button id="import-cancel-btn">Cancel</button>
+    </div>
+  </div>
+
+  <div id="modal-overlay"></div>
+
+  <div class="notification" id="notification">Task Exported Successfully!</div>
+
+
   <script>
-    const todoInput = document.getElementById('todo-input');
-    const addBtn = document.getElementById('add-btn');
-    const todoList = document.getElementById('todo-list');
-    const editModal = document.getElementById('edit-modal');
-    const confirmDeleteModal = document.getElementById('confirm-delete-modal');
-    const modalOverlay = document.getElementById('modal-overlay');
-    const editInput = document.getElementById('edit-input');
-    const saveEditBtn = document.getElementById('save-edit-btn');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
-    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+let todos = JSON.parse(localStorage.getItem('todos')) || [];
+let editedTaskId = null;
 
-    let todos = JSON.parse(localStorage.getItem('todos')) || [];
-    let currentEditIndex = null;
+const todoForm = document.getElementById('todo-form');
+const todoInput = document.getElementById('todo-input');
+const todoList = document.getElementById('todo-list');
+const notification = document.getElementById('notification');
+const exportBtn = document.getElementById('export-btn');
+const importBtn = document.getElementById('import-btn');
+const importModal = document.getElementById('import-modal');
+const importTextarea = document.getElementById('import-textarea');
+const importSaveBtn = document.getElementById('import-save-btn');
+const importCancelBtn = document.getElementById('import-cancel-btn');
 
-    function renderTodos() {
-      todoList.innerHTML = '';
-      todos.forEach((todo, index) => {
-        const li = document.createElement('li');
-        li.className = todo.completed ? 'completed' : '';
-        li.innerHTML = `
-          <div class="checkbox-container">
-            <div class="custom-checkbox ${todo.completed ? 'checked' : ''}" data-index="${index}"></div>
-            <span>${todo.task}</span>
-          </div>
-          <div class="action-buttons">
-            <button class="edit-btn" data-index="${index}">Edit</button>
-            <button class="delete-btn" data-index="${index}">Delete</button>
-          </div>
-        `;
-        todoList.appendChild(li);
-      });
-    }
+const editModal = document.getElementById('edit-modal');
+const editTaskInput = document.getElementById('edit-task-input');
+const saveEditBtn = document.getElementById('save-edit-btn');
+const cancelEditBtn = document.getElementById('cancel-edit-btn');
 
-    function saveTodos() {
+const confirmDeleteModal = document.getElementById('confirm-delete-modal');
+const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+
+const modalOverlay = document.getElementById('modal-overlay');
+
+// Sorting dropdown
+const sortBySelect = document.getElementById('sort-by-select');
+
+// Display tasks from the local storage
+function renderTasks() {
+  todoList.innerHTML = '';
+  todos.forEach((task) => {
+    const li = document.createElement('li');
+    li.classList.toggle('completed', task.completed);
+
+    const checkboxContainer = document.createElement('div');
+    checkboxContainer.classList.add('checkbox-container');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = task.completed;
+    const customCheckbox = document.createElement('div');
+    customCheckbox.classList.add('custom-checkbox');
+    if (task.completed) customCheckbox.classList.add('checked');
+    checkboxContainer.appendChild(checkbox);
+    checkboxContainer.appendChild(customCheckbox);
+
+    const taskContent = document.createElement('div');
+    taskContent.classList.add('task-content');
+    const taskText = document.createElement('span');
+    taskText.innerText = task.text || 'Untitled';  // Added fallback in case the task doesn't have text
+    taskContent.appendChild(taskText);
+
+    const actionButtons = document.createElement('div');
+    actionButtons.classList.add('action-buttons');
+    const editBtn = document.createElement('button');
+    editBtn.innerText = 'Edit';
+    editBtn.classList.add('edit-btn');
+    const deleteBtn = document.createElement('button');
+    deleteBtn.innerText = 'Delete';
+    deleteBtn.classList.add('delete-btn');
+    actionButtons.appendChild(editBtn);
+    actionButtons.appendChild(deleteBtn);
+
+    li.appendChild(checkboxContainer);
+    li.appendChild(taskContent);
+    li.appendChild(actionButtons);
+    todoList.appendChild(li);
+
+    // Edit task
+    editBtn.addEventListener('click', () => {
+      editedTaskId = task.id;
+      editTaskInput.value = task.text;
+      editModal.style.display = 'block';
+      modalOverlay.style.display = 'block';
+    });
+
+    // Delete task
+    deleteBtn.addEventListener('click', () => {
+      editedTaskId = task.id;  // Store the task ID for deletion
+      confirmDeleteModal.style.display = 'block';
+      modalOverlay.style.display = 'block';
+    });
+
+    // Toggle task completion
+    checkbox.addEventListener('change', () => {
+      task.completed = checkbox.checked;
+      customCheckbox.classList.toggle('checked', checkbox.checked);
       localStorage.setItem('todos', JSON.stringify(todos));
-    }
-
-    function toggleModal(modal, show) {
-      modal.style.display = show ? 'block' : 'none';
-      modalOverlay.style.display = show ? 'block' : 'none';
-    }
-
-    // Add Task
-    addBtn.addEventListener('click', () => {
-      const task = todoInput.value.trim();
-      if (task) {
-        todos.push({ task, completed: false });
-        saveTodos();
-        renderTodos();
-        todoInput.value = '';
-      }
     });
+  });
+}
 
-    // Toggle Completion
-    todoList.addEventListener('click', (e) => {
-      if (e.target.classList.contains('custom-checkbox')) {
-        const index = e.target.dataset.index;
-        todos[index].completed = !todos[index].completed;
-        saveTodos();
-        renderTodos();
-      }
-    });
+// Sort tasks based on selected option
+function sortTasks() {
+  const sortBy = sortBySelect.value;
+  if (sortBy === 'date') {
+    todos.sort((a, b) => b.id - a.id);  // Sort by date (newest first)
+  } else if (sortBy === 'completion') {
+    todos.sort((a, b) => b.completed - a.completed);  // Sort by completion (completed tasks first)
+  }
+  renderTasks();
+}
 
-
-// Edit Task
-todoList.addEventListener('click', (e) => {
-  if (e.target.classList.contains('edit-btn')) {
-    currentEditIndex = e.target.dataset.index;
-    editInput.value = todos[currentEditIndex].task;
-    toggleModal(editModal, true);
+// Add new task
+todoForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (todoInput.value.trim()) {
+    const newTask = {
+      id: Date.now(),
+      text: todoInput.value.trim(),
+      completed: false,
+    };
+    todos.push(newTask);
+    localStorage.setItem('todos', JSON.stringify(todos));
+    todoInput.value = '';
+    renderTasks();
   }
 });
 
+// Save edit task
 saveEditBtn.addEventListener('click', () => {
-  const updatedTask = editInput.value.trim();
+  const updatedTask = todos.find((task) => task.id === editedTaskId);
   if (updatedTask) {
-    todos[currentEditIndex].task = updatedTask;
-    saveTodos();
-    renderTodos();
-    toggleModal(editModal, false);
+    updatedTask.text = editTaskInput.value.trim();
+    localStorage.setItem('todos', JSON.stringify(todos));
+    renderTasks();
+    editModal.style.display = 'none';
+    modalOverlay.style.display = 'none';
   }
 });
 
+// Cancel edit task
 cancelEditBtn.addEventListener('click', () => {
-  toggleModal(editModal, false);
+  editModal.style.display = 'none';
+  modalOverlay.style.display = 'none';
 });
 
-// Delete Task
-todoList.addEventListener('click', (e) => {
-  if (e.target.classList.contains('delete-btn')) {
-    currentEditIndex = e.target.dataset.index;
-    toggleModal(confirmDeleteModal, true);
+// Confirm delete task
+confirmDeleteBtn.addEventListener('click', () => {
+  todos = todos.filter((task) => task.id !== editedTaskId); // Remove task by ID
+  localStorage.setItem('todos', JSON.stringify(todos));
+  renderTasks();
+  confirmDeleteModal.style.display = 'none';
+  modalOverlay.style.display = 'none';
+});
+
+// Cancel delete task
+cancelDeleteBtn.addEventListener('click', () => {
+  confirmDeleteModal.style.display = 'none';
+  modalOverlay.style.display = 'none';
+});
+
+// Export tasks
+exportBtn.addEventListener('click', () => {
+  const jsonTasks = JSON.stringify(todos);
+  navigator.clipboard.writeText(jsonTasks).then(() => {
+    notification.innerText = 'Tasks Exported Successfully!';
+    notification.style.display = 'block';
+    setTimeout(() => notification.style.display = 'none', 3000);
+  });
+});
+
+// Import tasks
+importBtn.addEventListener('click', () => {
+  importModal.style.display = 'block';
+  modalOverlay.style.display = 'block';
+});
+
+// Save imported tasks
+importSaveBtn.addEventListener('click', () => {
+  try {
+    const importedTasks = JSON.parse(importTextarea.value);
+    if (Array.isArray(importedTasks)) {
+      todos = importedTasks;
+      localStorage.setItem('todos', JSON.stringify(todos));
+      renderTasks();
+      importModal.style.display = 'none';
+      modalOverlay.style.display = 'none';
+    } else {
+      alert('Invalid JSON format!');
+    }
+  } catch (e) {
+    alert('Invalid JSON format!');
   }
 });
 
-confirmDeleteBtn.addEventListener('click', () => {
-  todos.splice(currentEditIndex, 1);
-  saveTodos();
-  renderTodos();
-  toggleModal(confirmDeleteModal, false);
+// Cancel import task
+importCancelBtn.addEventListener('click', () => {
+  importModal.style.display = 'none';
+  modalOverlay.style.display = 'none';
 });
 
-cancelDeleteBtn.addEventListener('click', () => {
-  toggleModal(confirmDeleteModal, false);
-});
+// Add event listener for sorting
+sortBySelect.addEventListener('change', sortTasks);
 
-// Initial Render
-renderTodos();
+// Render tasks on initial load
+renderTasks();
+
+
+
   </script>
 </body>
 </html>
