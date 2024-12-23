@@ -4,25 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Modern To-Do App</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
   <style>
 *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Arial',sans-serif;background-color:#1c1c1e;color:#f5f5f5;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh}h1{font-size:2.5rem;margin-bottom:20px;color:#007aff}#todo-form{display:flex;justify-content:center;margin-bottom:20px;width:100%;max-width:500px}#todo-form input{flex:1;padding:12px 15px;font-size:1rem;border:1px solid #3a3a3c;border-radius:10px;background-color:#2c2c2e;color:#f5f5f5;box-shadow:0 2px 4px rgba(0,0,0,0.5)}#todo-form button{padding:12px 20px;font-size:1rem;margin-left:10px;border:none;border-radius:10px;cursor:pointer;background-color:#007aff;color:#fff;transition:background-color 0.3s ease;box-shadow:0 2px 4px rgba(0,0,0,0.5)}#todo-form button:hover{background-color:#005bb5}ul{list-style-type:none;padding:0;width:100%;max-width:500px}li{display:flex;justify-content:space-between;align-items:center;padding:15px;margin-bottom:10px;background-color:#2c2c2e;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.5);transition:transform 0.2s ease,background-color 0.3s ease}li:hover{transform:scale(1.02);background-color:#3a3a3c}li.completed span{text-decoration:line-through;color:#8e8e93}.checkbox-container{display:flex;align-items:center;cursor:pointer}.checkbox-container input[type="checkbox"]{display:none}.custom-checkbox{width:24px;height:24px;border:2px solid #007aff;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-right:10px;transition:background-color 0.3s ease,border-color 0.3s ease}.custom-checkbox.checked{background-color:#007aff;border-color:#007aff}.custom-checkbox.checked::after{content:'🗸';color:#fff;font-size:20px}.task-content{flex:1;display:flex;align-items:center}.task-content span{margin-left:10px}.action-buttons{display:flex;gap:10px}.edit-btn,.delete-btn{padding:8px 12px;border:none;border-radius:10px;cursor:pointer;transition:background-color 0.3s ease;font-size:.9rem;font-weight:bold}.edit-btn{background-color:#34c759;color:#fff}.edit-btn:hover{background-color:#28a745}.delete-btn{background-color:#ff3b30;color:#fff}.delete-btn:hover{background-color:#c12a23}#edit-modal,#confirm-delete-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#2c2c2e;padding:30px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.5);display:none;z-index:1000;width:90%;max-width:400px}#edit-modal textarea,#edit-modal input{width:100%;padding:10px;margin-bottom:15px;border:1px solid #3a3a3c;border-radius:10px;background-color:#1c1c1e;color:#f5f5f5;font-size:1rem}#edit-modal button,#confirm-delete-modal button{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-size:1rem}#modal-options{display:flex;justify-content:center;gap:10px;margin-top:10px}#save-edit-btn{background-color:#34c759;color:#fff}#save-edit-btn:hover{background-color:#28a745}#cancel-edit-btn,#cancel-delete-btn{background-color:#ff3b30;color:#fff}#cancel-edit-btn:hover,#cancel-delete-btn:hover{background-color:#c12a23}#confirm-delete-btn{background-color:#ffcc00;color:#000}#confirm-delete-btn:hover{background-color:#e6b800}#modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:none;z-index:999}#export-import-buttons{margin-bottom:20px}#export-import-buttons button{padding:12px 20px;font-size:1rem;border:none;border-radius:10px;cursor:pointer;background-color:#007aff;color:#fff;margin:5px;transition:background-color 0.3s ease}#export-import-buttons button:hover{background-color:#005bb5}#import-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#2c2c2e;padding:30px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.5);display:none;z-index:1000;width:90%;max-width:400px}#import-modal textarea{width:100%;padding:10px;margin-bottom:15px;border:1px solid #3a3a3c;border-radius:10px;background-color:#1c1c1e;color:#f5f5f5;font-size:14px;min-height:100px}#import-modal button{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-size:1rem}#import-modal #import-save-btn{background-color:#34c759;color:#fff}#import-modal #import-save-btn:hover{background-color:#28a745}#import-modal #import-cancel-btn{background-color:#ff3b30;color:#fff}#import-modal #import-cancel-btn:hover{background-color:#c12a23}.notification{position:fixed;top:20px;left:50%;transform:translateX(-50%);background-color:#34c759;color:#fff;padding:15px;border-radius:10px;font-size:1.1rem;font-weight:bold;display:none;z-index:1001;max-width:80%;min-width:250px;text-align:center;transition:opacity .3s ease-in-out}.completed{text-decoration:line-through;color:#8e8e93}#export-import-sort-container{display:flex;justify-content:center;align-items:center}#sort-by-select{padding:12px 15px;font-size:1rem;border:1px solid #3a3a3c;border-radius:10px;background-color:#2c2c2e;color:#f5f5f5;appearance:none;-webkit-appearance:none;-moz-appearance:none;box-shadow:0 2px 4px rgba(0,0,0,0.5);transition:background-color 0.3s ease,border-color 0.3s ease;width:200px}#sort-by-select:hover{background-color:#3a3a3c;border-color:#007aff}#sort-by-select:focus{outline:none;background-color:#3a3a3c;border-color:#007aff;box-shadow:0 2px 6px rgba(0,122,255,.6)}
 
+/* Animation for task removal */
+.fade-out {
+  opacity: 0;
+  visibility: hidden;  /* This ensures the element is not interactable */
+  transition: opacity 10s ease-out, visibility 0s 10s; /* Delay visibility change for 10 seconds */
+}
+
+/* Completed task background color */
+.completed-task {
+  background-color: #1d2d22;  /* Light green color for completed tasks */
+}
+
 
   </style>
+
+
 </head>
 <body>
   <h1>Modern To-Do App</h1>
 
 <div id="export-import-sort-container">
-  <!-- Export, Import, Sort By, and Completed Buttons -->
   <div id="export-import-buttons">
-    <button id="export-btn">Export</button>
-    <button id="import-btn">Import</button>
+   <button id="export-btn">
+      <i class="fas fa-download"></i> Export
+    </button>
+    <button id="import-btn">
+      <i class="fas fa-upload"></i> Import
+    </button>
     <button id="completed-btn">Show Completed</button> 
-  <select id="sort-by-select">
-    <option value="date">Sort by Date</option>
-    <option value="priority">Sort by Priority</option>
-  </select>
 </div>
   </div>
 
@@ -71,6 +86,7 @@
   <script>
 let todos = JSON.parse(localStorage.getItem('todos')) || [];
 let editedTaskId = null;
+let showCompleted = false;  // Track whether we're showing completed tasks
 
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
@@ -78,6 +94,7 @@ const todoList = document.getElementById('todo-list');
 const notification = document.getElementById('notification');
 const exportBtn = document.getElementById('export-btn');
 const importBtn = document.getElementById('import-btn');
+const completedBtn = document.getElementById('completed-btn');
 const importModal = document.getElementById('import-modal');
 const importTextarea = document.getElementById('import-textarea');
 const importSaveBtn = document.getElementById('import-save-btn');
@@ -94,22 +111,24 @@ const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
 
 const modalOverlay = document.getElementById('modal-overlay');
 
-// Sorting dropdown
-const sortBySelect = document.getElementById('sort-by-select');
-
 // Display tasks from the local storage
-function renderTasks(filterCompleted = null) {
+function renderTasks() {
   todoList.innerHTML = ''; // Clear the list before re-rendering
 
   // Filter tasks if necessary
   let filteredTodos = todos;
-  if (filterCompleted !== null) {
-    filteredTodos = todos.filter(task => task.completed === filterCompleted);
+  if (showCompleted !== null) {
+    filteredTodos = todos.filter(task => task.completed === showCompleted);
   }
 
   filteredTodos.forEach((task) => {
     const li = document.createElement('li');
     li.classList.toggle('completed', task.completed); // Update the list item's class based on completion
+
+    // Add background color for completed tasks
+    if (task.completed) {
+      li.classList.add('completed-task'); // Light green background for completed tasks
+    }
 
     const checkboxContainer = document.createElement('div');
     checkboxContainer.classList.add('checkbox-container');
@@ -169,14 +188,14 @@ function renderTasks(filterCompleted = null) {
       modalOverlay.style.display = 'block';
     });
 
-    // Toggle task completion on checkbox change
+    // Toggle task completion on checkbox change with animation
     checkbox.addEventListener('change', () => {
       task.completed = checkbox.checked; // Update task's completed state
 
       // Update the visual state of the custom checkbox
       customCheckbox.classList.toggle('checked', checkbox.checked);
 
-      // Update the DOM immediately to show strikethrough
+      // Update the DOM immediately to show strikethrough (only for task text)
       const taskText = taskContent.querySelector('span');
       if (task.completed) {
         taskText.classList.add('completed'); // Add strikethrough class
@@ -184,36 +203,44 @@ function renderTasks(filterCompleted = null) {
         taskText.classList.remove('completed'); // Remove strikethrough class
       }
 
+      // Handle task completion/uncompletion with animation
+      if (checkbox.checked) {
+        li.classList.add('fade-out'); // Add animation to hide the task
+        setTimeout(() => {
+          li.style.display = 'none'; // Actually hide the task after animation (10 seconds)
+        }, 10000); // Animation duration (10 seconds)
+      } else {
+        li.classList.remove('fade-out'); // Reset the animation
+        li.style.display = ''; // Show the task again if unchecked
+        li.classList.remove('completed-task'); // Remove the completed background
+
+        // Move the task back to the "Todo" section if it's unchecked
+        todos = todos.map(t => t.id === task.id ? { ...t, completed: false } : t);
+        localStorage.setItem('todos', JSON.stringify(todos));
+      }
+
       // Update the todos array and save to localStorage
       todos = todos.map(t => t.id === task.id ? { ...t, completed: task.completed } : t);
       localStorage.setItem('todos', JSON.stringify(todos));
+
+      // Re-render tasks to update the task lists
+      renderTasks();
     });
   });
 }
 
-// Show only todo tasks
-document.getElementById('completed-btn').addEventListener('click', function () {
-  const isShowingCompleted = this.innerText === 'Show Completed';
+// Show only completed tasks or only todo tasks
+completedBtn.addEventListener('click', function () {
+  showCompleted = !showCompleted; // Toggle the state
 
-  if (isShowingCompleted) {
+  if (showCompleted) {
     this.innerText = 'Show Todo'; // Change button text when showing completed tasks
-    renderTasks(true); // Show only completed tasks
   } else {
-    this.innerText = 'Show Completed'; // Reset to show completed text
-    renderTasks(false); // Show only todo tasks
+    this.innerText = 'Show Completed'; // Reset button text when showing todo tasks
   }
-});
 
-// Sorting tasks based on selected option
-function sortTasks() {
-  const sortBy = sortBySelect.value;
-  if (sortBy === 'date') {
-    todos.sort((a, b) => b.id - a.id);  // Sort by date (newest first)
-  } else if (sortBy === 'completion') {
-    todos.sort((a, b) => b.completed - a.completed);  // Sort by completion (completed tasks first)
-  }
-  renderTasks();
-}
+  renderTasks(); // Re-render tasks based on the filter
+});
 
 // Add new task
 todoForm.addEventListener('submit', (e) => {
@@ -227,7 +254,7 @@ todoForm.addEventListener('submit', (e) => {
     todos.push(newTask);
     localStorage.setItem('todos', JSON.stringify(todos));
     todoInput.value = '';
-    renderTasks(false); // Show only todo tasks
+    renderTasks(); // Re-render tasks after adding new task
   }
 });
 
@@ -304,11 +331,8 @@ importCancelBtn.addEventListener('click', () => {
   modalOverlay.style.display = 'none';
 });
 
-// Add event listener for sorting
-sortBySelect.addEventListener('change', sortTasks);
-
-// Render tasks on initial load (only show todos by default)
-renderTasks(false);
+// Initial render
+renderTasks();
 
 
   </script>
