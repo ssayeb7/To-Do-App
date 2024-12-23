@@ -13,19 +13,17 @@
 <body>
   <h1>Modern To-Do App</h1>
 
-  <!-- Container for the Import/Export buttons and Sort by dropdown at the top -->
-  <div id="export-import-sort-container">
-    <!-- Import and Export buttons -->
-    <div id="export-import-buttons">
-      <button id="export-btn">Export</button>
-      <button id="import-btn">Import</button>
-    </div>
-
-    <!-- Sort By dropdown -->
-    <select id="sort-by-select">
-      <option value="date">Sort by Date</option>
-      <option value="completion">Sort by Completion</option>
-    </select>
+<div id="export-import-sort-container">
+  <!-- Export, Import, Sort By, and Completed Buttons -->
+  <div id="export-import-buttons">
+    <button id="export-btn">Export</button>
+    <button id="import-btn">Import</button>
+    <button id="completed-btn">Show Completed</button> 
+  <select id="sort-by-select">
+    <option value="date">Sort by Date</option>
+    <option value="priority">Sort by Priority</option>
+  </select>
+</div>
   </div>
 
   <!-- To-Do Form -->
@@ -71,13 +69,6 @@
   <div class="notification" id="notification">Task Exported Successfully!</div>
 
   <script>
-    // Your existing script here...
-  </script>
-</body>
-
-
-
-  <script>
 let todos = JSON.parse(localStorage.getItem('todos')) || [];
 let editedTaskId = null;
 
@@ -107,10 +98,16 @@ const modalOverlay = document.getElementById('modal-overlay');
 const sortBySelect = document.getElementById('sort-by-select');
 
 // Display tasks from the local storage
-function renderTasks() {
+function renderTasks(filterCompleted = null) {
   todoList.innerHTML = ''; // Clear the list before re-rendering
 
-  todos.forEach((task) => {
+  // Filter tasks if necessary
+  let filteredTodos = todos;
+  if (filterCompleted !== null) {
+    filteredTodos = todos.filter(task => task.completed === filterCompleted);
+  }
+
+  filteredTodos.forEach((task) => {
     const li = document.createElement('li');
     li.classList.toggle('completed', task.completed); // Update the list item's class based on completion
 
@@ -172,32 +169,42 @@ function renderTasks() {
       modalOverlay.style.display = 'block';
     });
 
-// Toggle task completion on checkbox change
-checkbox.addEventListener('change', () => {
-  task.completed = checkbox.checked; // Update task's completed state
+    // Toggle task completion on checkbox change
+    checkbox.addEventListener('change', () => {
+      task.completed = checkbox.checked; // Update task's completed state
 
-  // Update the visual state of the custom checkbox
-  customCheckbox.classList.toggle('checked', checkbox.checked);
+      // Update the visual state of the custom checkbox
+      customCheckbox.classList.toggle('checked', checkbox.checked);
 
-  // Update the DOM immediately to show strikethrough
-  const taskText = taskContent.querySelector('span');
-  if (task.completed) {
-    taskText.classList.add('completed'); // Add strikethrough class
-  } else {
-    taskText.classList.remove('completed'); // Remove strikethrough class
-  }
+      // Update the DOM immediately to show strikethrough
+      const taskText = taskContent.querySelector('span');
+      if (task.completed) {
+        taskText.classList.add('completed'); // Add strikethrough class
+      } else {
+        taskText.classList.remove('completed'); // Remove strikethrough class
+      }
 
-  // Update the todos array and save to localStorage
-  todos = todos.map(t => t.id === task.id ? { ...t, completed: task.completed } : t);
-  localStorage.setItem('todos', JSON.stringify(todos));
-});
-
+      // Update the todos array and save to localStorage
+      todos = todos.map(t => t.id === task.id ? { ...t, completed: task.completed } : t);
+      localStorage.setItem('todos', JSON.stringify(todos));
+    });
   });
 }
 
+// Show only completed tasks or all tasks
+document.getElementById('completed-btn').addEventListener('click', function () {
+  const isShowingCompleted = this.innerText === 'Show Completed';
 
+  if (isShowingCompleted) {
+    this.innerText = 'Show All'; // Change button text when showing only completed tasks
+    renderTasks(true); // Show only completed tasks
+  } else {
+    this.innerText = 'Show Completed'; // Reset to show completed text
+    renderTasks(); // Show all tasks
+  }
+});
 
-// Sort tasks based on selected option
+// Sorting tasks based on selected option
 function sortTasks() {
   const sortBy = sortBySelect.value;
   if (sortBy === 'date') {
@@ -224,7 +231,7 @@ todoForm.addEventListener('submit', (e) => {
   }
 });
 
-// Save edit task
+// Save edited task
 saveEditBtn.addEventListener('click', () => {
   const updatedTask = todos.find((task) => task.id === editedTaskId);
   if (updatedTask) {
@@ -302,6 +309,7 @@ sortBySelect.addEventListener('change', sortTasks);
 
 // Render tasks on initial load
 renderTasks();
+
 
   </script>
 </body>
