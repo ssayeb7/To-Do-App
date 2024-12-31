@@ -290,6 +290,10 @@ function showNotification(message, type = 'success') {
     setTimeout(() => notification.style.display = 'none', 3000);
 }
 
+// Add event listeners for online/offline status
+window.addEventListener('online', () => showNotification('You are online'));
+window.addEventListener('offline', () => showNotification('You are offline'));
+
 // Add translations
 const translations = {
     en: {
@@ -590,6 +594,21 @@ function initializeSettings() {
 
 // Apply theme on load
 document.body.classList.toggle('light-theme', localStorage.getItem('darkMode') === 'false');
+
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registered');
+            })
+            .catch(err => {
+                console.log('ServiceWorker registration failed:', err);
+document.body.classList.toggle('light-theme', localStorage.getItem('darkMode') === 'false');
+            });
+    });
+}
+
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
