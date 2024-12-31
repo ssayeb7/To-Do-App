@@ -22,7 +22,7 @@ li.completed span{text-decoration:line-through;color:#8e8e93}
 .edit-btn:hover{background-color:#28a745}
 .delete-btn{background-color:#ff3b30;color:#fff}
 .delete-btn:hover{background-color:#c12a23}
-#edit-modal,#confirm-delete-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#2c2c2e;padding:30px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.5);display:none;z-index:1000;width:90%;max-width:400px}
+#edit-modal,#confirm-delete-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#2c2c2e;padding:30px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.5);display:none;z-index:2100;width:90%;max-width:400px}
 #edit-modal textarea,#edit-modal input{width:100%;padding:10px;margin-bottom:15px;border:1px solid #3a3a3c;border-radius:10px;background-color:#1c1c1e;color:#f5f5f5;font-size:1rem;max-block-size: 100px;max-width: 350px;}
 #edit-modal button,#confirm-delete-modal button{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-size:1rem}
 #modal-options{display:flex;justify-content:center;gap:10px;margin-top:10px}
@@ -32,18 +32,17 @@ li.completed span{text-decoration:line-through;color:#8e8e93}
 #cancel-edit-btn:hover,#cancel-delete-btn:hover{background-color:#c12a23}
 #confirm-delete-btn{background-color:#ffcc00;color:#000}
 #confirm-delete-btn:hover{background-color:#e6b800}
-#modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:none;z-index:999}
+#modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:none;z-index:2000;backdrop-filter: blur(5px);}
 #export-import-buttons{margin-bottom:20px}
 #export-import-buttons button{padding:12px 20px;font-size:1rem;border:none;border-radius:10px;cursor:pointer;background-color:#007aff;color:#fff;margin:5px;transition:background-color 0.3s ease}
 #export-import-buttons button:hover{background-color:#005bb5}
-#import-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#2c2c2e;padding:30px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.5);display:none;z-index:1000;width:90%;max-width:400px}
+#import-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#2c2c2e;padding:30px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.5);display:none;z-index:2100;width:90%;max-width:400px;border: 2px solid #007aff;}
 #import-modal textarea{width:100%;padding:10px;margin-bottom:15px;border:1px solid #3a3a3c;border-radius:10px;background-color:#1c1c1e;color:#f5f5f5;font-size:14px;    max-block-size: 100px;max-width: 350px;}
 #import-modal button{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-size:1rem}
 #import-modal #import-save-btn{background-color:#34c759;color:#fff}
 #import-modal #import-save-btn:hover{background-color:#28a745}
 #import-modal #import-cancel-btn{background-color:#ff3b30;color:#fff}
 #import-modal #import-cancel-btn:hover{background-color:#c12a23}
-.notification{position:fixed;top:20px;left:50%;transform:translateX(-50%);background-color:#34c759;color:#fff;padding:15px;border-radius:10px;font-size:1.1rem;font-weight:bold;display:none;z-index:1001;max-width:80%;min-width:250px;text-align:center;transition:opacity .3s ease-in-out}
 .completed{color:#8e8e93}
 #export-import-sort-container{display:flex;justify-content:center;align-items:center}
 #sort-by-select{padding:12px 15px;font-size:1rem;border:1px solid #3a3a3c;border-radius:10px;background-color:#2c2c2e;color:#f5f5f5;appearance:none;-webkit-appearance:none;-moz-appearance:none;box-shadow:0 2px 4px rgba(0,0,0,0.5);transition:background-color 0.3s ease,border-color 0.3s ease;width:200px}
@@ -121,4 +120,505 @@ opacity: 1;
 .error-message.hide {
 opacity: 0;
 display: none;
+}
+
+/* Settings Icon and Popup Styles */
+.settings-icon {
+    position: fixed;
+    top: 20px;
+    right: 20px;  /* Changed from left: 20px to right: 20px */
+    font-size: 24px;
+    color: #007aff;
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.settings-icon:hover {
+    transform: rotate(90deg);
+}
+
+.settings-popup {
+    position: fixed;
+    top: 60px;
+    right: 20px;  /* Changed from left: 20px to right: 20px */
+    background-color: #2c2c2e;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    z-index: 1500;
+    display: none;
+    min-width: 200px;
+}
+
+.settings-popup.active {
+    display: block;
+}
+
+.settings-popup ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.settings-popup li {
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.settings-popup li:hover {
+    background-color: #3a3a3c;
+}
+
+.settings-popup li i {
+    margin-right: 10px;
+    color: #007aff;
+}
+
+
+/* Toggle switch styles */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-left: 10px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #007aff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.menu-item-text {
+    display: flex;
+    align-items: center;
+}
+
+.clear-storage-warning {
+    color: #ff3b30;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.coming-soon {
+    font-size: 0.8em;
+    color: #666;
+    margin-left: 10px;
+}
+
+/* Language select styles */
+#language-select {
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: #2c2c2e;
+    color: #f5f5f5;
+    border: 1px solid #3a3a3c;
+    cursor: pointer;
+}
+
+#language-select:hover {
+    border-color: #007aff;
+}
+
+/* Clear storage confirmation styles */
+.clear-storage-confirmation {
+    display: none;
+    background-color: #ff3b30;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+#clear-storage-btn:hover .clear-storage-confirmation {
+    display: block;
+}
+
+/* Light theme styles */
+body.light-theme {
+    background-color: #f5f5f5;
+    color: #1c1c1e;
+}
+
+.light-theme .settings-popup,
+.light-theme #todo-form input,
+.light-theme li,
+.light-theme #edit-modal,
+.light-theme #import-modal {
+    background-color: #ffffff;
+    color: #1c1c1e;
+}
+
+.light-theme .settings-popup li:hover {
+    background-color: #f0f0f0;
+}
+
+/* Clear storage confirmation modal */
+#clear-storage-confirmation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #2c2c2e;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    z-index: 2100;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    display: none;
+    pointer-events: auto;
+}
+#clear-storage-confirmation .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#clear-storage-confirmation button {
+    width: 48%; /* Almost 50% with some gap */
+    padding: 12px 0;
+}
+
+#clear-storage-yes {
+    background-color: #ff3b30;
+    color: white;
+}
+
+#clear-storage-no {
+    background-color: #007aff;
+    color: white;
+}
+
+/* About modal styles */
+#about-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #2c2c2e;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    z-index: 2100;
+    width: 90%;
+    max-width: 400px;
+    display: none;
+}
+
+#about-modal h3 {
+    color: #007aff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.about-content {
+    margin-bottom: 20px;
+}
+
+.about-content p {
+    margin-bottom: 10px;
+}
+
+.about-content ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin-top: 5px;
+}
+
+.about-content a {
+    color: #007aff;
+    text-decoration: none;
+}
+
+.about-content a:hover {
+    text-decoration: underline;
+}
+
+#close-about-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007aff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+#close-about-btn:hover {
+    background-color: #005bb5;
+}
+
+/* Fix for clear storage confirmation */
+#clear-storage-confirmation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #2c2c2e;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    z-index: 2100;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    display: none
+    pointer-events: auto;
+}
+
+#about-modal, #clear-storage-confirmation, #backup-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #2c2c2e;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+    width: 90%;
+    max-width: 400px;
+    display: none;
+    z-index: 3000;
+    pointer-events: auto !important;
+}
+
+.backup-content {
+    margin: 20px 0;
+    text-align: center;
+    line-height: 1.5;
+}
+
+#close-backup-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007aff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+#close-backup-btn:hover {
+    background-color: #005bb5;
+}
+
+.settings-popup {
+    z-index: 10;
+}
+
+.settings-icon {
+    z-index: 2990;
+}
+
+/* Ensure modals are clickable */
+#about-modal, #clear-storage-confirmation {
+    pointer-events: auto !important;
+}
+
+/* Add styles for modal buttons */
+#clear-storage-confirmation .button-container button,
+#about-modal #close-about-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+#clear-storage-confirmation .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 15px;
+}
+
+/* Import modal styles to match clear storage modal */
+#import-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #2c2c2e;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    z-index: 3000;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    display: none;
+}
+
+#import-modal .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+#import-modal button {
+    width: 48%;
+    padding: 12px 0;
+}
+
+#import-save-btn {
+    background-color: #007aff;
+    color: white;
+}
+
+#import-cancel-btn {
+    background-color: #ff3b30;
+    color: white;
+}
+
+.backup-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.backup-options button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    background-color: #2c2c2e;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+#copy-key-btn {
+    background-color: #007aff;
+}
+
+#download-backup-btn {
+    background-color: #34c759;
+}
+
+.import-options {
+    margin: 20px 0;
+}
+
+.file-upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    background-color: #007aff;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.or-divider {
+    text-align: center;
+    margin: 15px 0;
+    color: #666;
+}
+
+/* Make textareas non-resizable */
+textarea {
+    resize: none;
+    font-family: 'Arial', sans-serif;
+    height: 100px;
+}
+
+/* Update modal styles */
+#import-modal textarea,
+#edit-modal textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #3a3a3c;
+    border-radius: 10px;
+    background-color: #1c1c1e;
+    color: #f5f5f5;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+/* Add new notification styles */
+#notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #34c759;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    display: none;
+    z-index: 9999;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    min-width: 300px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
 }

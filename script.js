@@ -1,3 +1,40 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const settingsIcon = document.querySelector('.settings-icon');
+    const settingsPopup = document.querySelector('.settings-popup');
+    const mainContent = document.querySelector('body > *:not(.settings-icon):not(.settings-popup)');
+
+    settingsIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        settingsPopup.classList.toggle('active');
+        
+        // Toggle blur effect on main content
+        Array.from(document.body.children).forEach(element => {
+            if (element !== settingsIcon && element !== settingsPopup) {
+                element.classList.toggle('blur-background');
+            }
+        });
+    });
+
+    // Close popup when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!settingsPopup.contains(e.target) && !settingsIcon.contains(e.target)) {
+            settingsPopup.classList.remove('active');
+            Array.from(document.body.children).forEach(element => {
+                if (element !== settingsIcon && element !== settingsPopup) {
+                    element.classList.remove('blur-background');
+                }
+            });
+        }
+    });
+
+    // Prevent popup from closing when clicking inside it
+    settingsPopup.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    initializeSettings();
+});
+
 let todos = JSON.parse(localStorage.getItem('todos')) || [];
 let editedTaskId = null;
 let showCompleted = false;  // Track whether we're showing completed tasks
@@ -243,3 +280,326 @@ importCancelBtn.addEventListener('click', () => {
 
 // Initial render
 renderTasks();
+
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    notification.innerText = message;
+    notification.style.backgroundColor = type === 'error' ? '#ff3b30' : '#34c759';
+    notification.style.display = 'block';
+    notification.style.zIndex = '3000'; // Ensure it's above everything
+    setTimeout(() => notification.style.display = 'none', 3000);
+}
+
+// Add translations
+const translations = {
+    en: {
+        addTask: "Add a new task",
+        addButton: "Add",
+        editButton: "Edit",
+        deleteButton: "Delete",
+        showCompleted: "Show Completed",
+        showTodo: "Show Todo",
+        confirmDelete: "Are you sure you want to delete this task?",
+        yes: "Yes",
+        no: "No",
+        clearStorage: "Clear Storage & Cache",
+        confirmClear: "Are you sure? This will delete all your tasks and settings.",
+        taskExported: "Tasks Exported Successfully!",
+        invalidJson: "Invalid JSON format! Please try again.",
+        noTasks: "Make a todo to get started!",
+        noCompletedTasks: "You didn't complete any tasks yet."
+    },
+    bn: {
+        addTask: "নতুন টাস্ক যোগ করুন",
+        addButton: "যোগ করুন",
+        editButton: "সম্পাদনা",
+        deleteButton: "মুছুন",
+        showCompleted: "সম্পন্ন কাজগুলি দেখুন",
+        showTodo: "বাকি কাজগুলি দেখুন",
+        confirmDelete: "আপনি কি এই টাস্কটি মুছে ফেলতে চান?",
+        yes: "হ্যাঁ",
+        no: "না",
+        clearStorage: "স্টোরেজ এবং ক্যাশে পরিষ্কার করুন",
+        confirmClear: "আপনি কি নিশ্চিত? এটি আপনার সমস্ত টাস্ক এবং সেটিংস মুছে ফেলবে।",
+        taskExported: "টাস্কগুলি সফলভাবে এক্সপোর্ট করা হয়েছে!",
+        invalidJson: "অবৈধ JSON ফরম্যাট! অনুগ্রহ করে আবার চেষ্টা করুন।",
+        noTasks: "শুরু করতে একটি টাস্ক তৈরি করুন!",
+        noCompletedTasks: "আপনি এখনও কোন টাস্ক সম্পন্ন করেননি।"
+    }
+};
+
+function updateLanguage(lang) {
+    const currentLang = translations[lang] || translations.en;
+    
+    // Update all text elements
+    document.getElementById('todo-input').placeholder = currentLang.addTask;
+    document.querySelector('#todo-form button').textContent = currentLang.addButton;
+    document.querySelectorAll('.edit-btn').forEach(btn => btn.textContent = currentLang.editButton);
+    document.querySelectorAll('.delete-btn').forEach(btn => btn.textContent = currentLang.deleteButton);
+    document.getElementById('completed-btn').textContent = showCompleted ? currentLang.showTodo : currentLang.showCompleted;
+    
+    // Update modal texts
+    document.querySelector('#confirm-delete-modal p').textContent = currentLang.confirmDelete;
+    document.getElementById('confirm-delete-btn').textContent = currentLang.yes;
+    document.getElementById('cancel-delete-btn').textContent = currentLang.no;
+    
+    // Re-render tasks to update any task-related text
+    renderTasks();
+}
+
+function clearStorageAndCache() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Clear localStorage
+            localStorage.clear();
+            
+            // Clear all caches
+            if ('caches' in window) {
+                const cacheKeys = await caches.keys();
+                await Promise.all(cacheKeys.map(key => caches.delete(key)));
+            }
+            
+            // Unregister service workers
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.getServiceWorkerRegistrations();
+                await Promise.all(registrations.map(reg => reg.unregister()));
+            }
+            
+            resolve();
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+function downloadBackup(data, filename) {
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function initializeSettings() {
+    const settingsIcon = document.querySelector('.settings-icon');
+    const settingsPopup = document.querySelector('.settings-popup');
+    const modalOverlay = document.getElementById('modal-overlay');
+    
+    // Get all modal elements
+    const aboutBtn = document.getElementById('about-btn');
+    const aboutModal = document.getElementById('about-modal');
+    const closeAboutBtn = document.getElementById('close-about-btn');
+    const clearStorageBtn = document.getElementById('clear-storage-btn');
+    const clearStorageConfirmation = document.getElementById('clear-storage-confirmation');
+    const clearStorageYes = document.getElementById('clear-storage-yes');
+    const clearStorageNo = document.getElementById('clear-storage-no');
+    const backupModal = document.getElementById('backup-modal');
+    const closeBackupBtn = document.getElementById('close-backup-btn');
+
+    function showModal(modal) {
+        settingsPopup.classList.remove('active');
+        modalOverlay.style.display = 'block';
+        modal.style.display = 'block';
+        document.body.classList.add('blur-background');
+    }
+
+    function hideModal(modal) {
+        modal.style.display = 'none';
+        modalOverlay.style.display = 'none';
+        document.body.classList.remove('blur-background');
+    }
+
+    // Modified export/backup handler
+    exportBtn.addEventListener('click', () => {
+        const jsonTasks = JSON.stringify(todos);
+        navigator.clipboard.writeText(jsonTasks).then(() => {
+            showModal(backupModal);
+        });
+    });
+
+    closeBackupBtn.addEventListener('click', () => {
+        hideModal(backupModal);
+    });
+
+    // About button handler
+    aboutBtn.addEventListener('click', () => {
+        showModal(aboutModal);
+    });
+
+    closeAboutBtn.addEventListener('click', () => {
+        hideModal(aboutModal);
+    });
+
+    // Clear storage handler
+    clearStorageBtn.addEventListener('click', () => {
+        showModal(clearStorageConfirmation);
+    });
+
+    clearStorageYes.addEventListener('click', () => {
+        try {
+            // Clear data immediately
+            localStorage.clear();
+            todos = [];
+            
+            // Clear caches if available
+            if ('caches' in window) {
+                caches.keys().then(keys => {
+                    keys.forEach(key => caches.delete(key));
+                });
+            }
+
+            // Hide modal immediately
+            hideModal(clearStorageConfirmation);
+            
+            // Show notification and reload
+            showNotification('Storage cleared! Reloading...');
+            
+            // Force reload after a short delay
+            setTimeout(() => {
+                window.location.href = window.location.href;
+            }, 1000);
+
+        } catch (error) {
+            showNotification('Failed to clear storage', 'error');
+        }
+    });
+
+    clearStorageNo.addEventListener('click', () => {
+        hideModal(clearStorageConfirmation);
+    });
+
+    // Close all modals when clicking overlay
+    modalOverlay.addEventListener('click', () => {
+        [aboutModal, clearStorageConfirmation, backupModal].forEach(modal => {
+            hideModal(modal);
+        });
+    });
+
+    // Theme toggle handler
+    const themeToggle = document.getElementById('theme-mode-toggle');
+    themeToggle.addEventListener('change', () => {
+        document.body.classList.toggle('light-theme', !themeToggle.checked);
+        localStorage.setItem('darkMode', themeToggle.checked);
+    });
+
+    // Language handler
+    const languageSelect = document.getElementById('language-select');
+    languageSelect.addEventListener('change', () => {
+        const selectedLang = languageSelect.value;
+        localStorage.setItem('language', selectedLang);
+        updateLanguage(selectedLang);
+    });
+
+    // Initialize language
+    updateLanguage(localStorage.getItem('language') || 'en');
+
+    // Backup modal handlers
+    const copyKeyBtn = document.getElementById('copy-key-btn');
+    const downloadBackupBtn = document.getElementById('download-backup-btn');
+
+    copyKeyBtn.addEventListener('click', () => {
+        const jsonTasks = JSON.stringify(todos);
+        navigator.clipboard.writeText(jsonTasks)
+            .then(() => {
+                hideModal(backupModal); // First hide the modal
+                showNotification('Secret key copied to clipboard!'); // Then show notification
+            })
+            .catch(() => {
+                showNotification('Failed to copy key', 'error');
+            });
+    });
+
+    downloadBackupBtn.addEventListener('click', () => {
+        const timestamp = new Date().toISOString().split('T')[0];
+        downloadBackup(todos, `todo-backup-${timestamp}.json`);
+        showNotification('Backup file downloaded!');
+    });
+
+    // Import modal handlers
+    const importFile = document.getElementById('import-file');
+    
+    importFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                importTextarea.value = event.target.result;
+            };
+            reader.readAsText(file);
+        }
+    });
+
+    // Modified import button handler
+    importBtn.addEventListener('click', () => {
+        showModal(importModal);
+        settingsPopup.classList.remove('active');
+    });
+
+    // Close modals when clicking outside
+    modalOverlay.addEventListener('click', () => {
+        const modals = [aboutModal, clearStorageConfirmation, backupModal, importModal];
+        modals.forEach(modal => {
+            if (modal.style.display === 'block') {
+                hideModal(modal);
+            }
+        });
+    });
+
+    // Export handler
+    exportBtn.addEventListener('click', () => {
+        const jsonTasks = JSON.stringify(todos);
+        navigator.clipboard.writeText(jsonTasks);
+        showModal(backupModal);
+        settingsPopup.classList.remove('active');
+    });
+
+    // PWA installation handler
+    let deferredPrompt;
+    const installApp = document.getElementById('install-app');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installApp.style.display = 'flex'; // Show install button
+    });
+
+    installApp.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+            showNotification('App installed successfully!');
+        }
+        
+        deferredPrompt = null;
+        installApp.style.display = 'none';
+    });
+
+    // Hide install button if app is already installed
+    window.addEventListener('appinstalled', () => {
+        installApp.style.display = 'none';
+        showNotification('App installed successfully!');
+    });
+}
+
+// Apply theme on load
+document.body.classList.toggle('light-theme', localStorage.getItem('darkMode') === 'false');
+
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registered');
+            })
+            .catch(err => {
+                console.log('ServiceWorker registration failed:', err);
+            });
+    });
+}
