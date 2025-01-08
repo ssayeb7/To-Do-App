@@ -1,124 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>CSS Minifier</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+    <style>
+:root{--bg-color:#fff;--text-color:#333;--border-color:#ddd;--primary-color:#4a90e2;--container-bg:#f5f5f5;--heading-color:#2c3e50;--font-size-base:16px}
+body.dark-mode{--bg-color:#1a1a1a;--text-color:#fff;--border-color:#444;--container-bg:#2d2d2d;--heading-color:#e2e8f0}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Arial',sans-serif;background-color:#1c1c1e;color:#f5f5f5;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh}
-h1{font-size:2rem;text-align:center;margin:20px 0}h1 a{text-decoration:none;color:#007bff;display:flex;align-items:center;justify-content:center;gap:10px;transition:color .3s ease}h1 a:hover{color:#ffffff}h1 a i{font-size:1.5rem;color:#007bff;transition:color .3s ease}h1 a:hover i{color:#ffffff}
-#todo-form{display:flex;justify-content:center;margin-bottom:20px;width:100%;max-width:500px}
-#todo-form input{flex:1;padding:12px 15px;font-size:1rem;border:1px solid #3a3a3c;border-radius:10px;background-color:#2c2c2e;color:#f5f5f5;box-shadow:0 2px 4px rgba(0,0,0,0.5)}
-#todo-form button{padding:12px 20px;font-size:1rem;margin-left:10px;border:none;border-radius:10px;cursor:pointer;background-color:#007aff;color:#fff;transition:background-color 0.3s ease;box-shadow:0 2px 4px rgba(0,0,0,0.5)}
-#todo-form button:hover{background-color:#005bb5}
-ul{list-style-type:none;padding:0;width:100%;max-width:500px}
-li{display:flex;justify-content:space-between;align-items:center;padding:15px;margin-bottom:10px;background-color:#2c2c2e;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.5);transition:transform 0.2s ease,background-color 0.3s ease}
-li:hover{transform:scale(1.02);background-color:#3a3a3c}
-li.completed span{text-decoration:line-through;color:#8e8e93}
-.checkbox-container{display:flex;align-items:center;cursor:pointer}
-.checkbox-container input[type="checkbox"]{display:none}
-.custom-checkbox{width:24px;height:24px;border:2px solid #007aff;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-right:10px;transition:background-color 0.3s ease,border-color 0.3s ease}
-.custom-checkbox.checked{background-color:#007aff;border-color:#007aff}
-.custom-checkbox.checked::after{content:'🗸';color:#fff;font-size:20px}
-.task-content{flex:1;display:flex;align-items:center}
-.task-content span{margin-left:10px}
-.action-buttons{display:flex;gap:10px}
-.edit-btn,.delete-btn{padding:8px 12px;border:none;border-radius:10px;cursor:pointer;transition:background-color 0.3s ease;font-size:.9rem;font-weight:bold}
-.edit-btn{background-color:#34c759;color:#fff}
-.edit-btn:hover{background-color:#28a745}
-.delete-btn{background-color:#ff3b30;color:#fff}
-.delete-btn:hover{background-color:#c12a23}
-#edit-modal,#confirm-delete-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#2c2c2e;padding:30px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.5);display:none;z-index:1000;width:90%;max-width:400px}
-#edit-modal textarea,#edit-modal input{width:100%;padding:10px;margin-bottom:15px;border:1px solid #3a3a3c;border-radius:10px;background-color:#1c1c1e;color:#f5f5f5;font-size:1rem;max-block-size: 100px;max-width: 350px;}
-#edit-modal button,#confirm-delete-modal button{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-size:1rem}
-#modal-options{display:flex;justify-content:center;gap:10px;margin-top:10px}
-#save-edit-btn{background-color:#34c759;color:#fff}
-#save-edit-btn:hover{background-color:#28a745}
-#cancel-edit-btn,#cancel-delete-btn{background-color:#ff3b30;color:#fff}
-#cancel-edit-btn:hover,#cancel-delete-btn:hover{background-color:#c12a23}
-#confirm-delete-btn{background-color:#ffcc00;color:#000}
-#confirm-delete-btn:hover{background-color:#e6b800}
-#modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:none;z-index:999}
-#export-import-buttons{margin-bottom:20px}
-#export-import-buttons button{padding:12px 20px;font-size:1rem;border:none;border-radius:10px;cursor:pointer;background-color:#007aff;color:#fff;margin:5px;transition:background-color 0.3s ease}
-#export-import-buttons button:hover{background-color:#005bb5}
-#import-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#2c2c2e;padding:30px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.5);display:none;z-index:1000;width:90%;max-width:400px}
-#import-modal textarea{width:100%;padding:10px;margin-bottom:15px;border:1px solid #3a3a3c;border-radius:10px;background-color:#1c1c1e;color:#f5f5f5;font-size:14px;    max-block-size: 100px;max-width: 350px;}
-#import-modal button{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-size:1rem}
-#import-modal #import-save-btn{background-color:#34c759;color:#fff}
-#import-modal #import-save-btn:hover{background-color:#28a745}
-#import-modal #import-cancel-btn{background-color:#ff3b30;color:#fff}
-#import-modal #import-cancel-btn:hover{background-color:#c12a23}
-.notification{position:fixed;top:20px;left:50%;transform:translateX(-50%);background-color:#34c759;color:#fff;padding:15px;border-radius:10px;font-size:1.1rem;font-weight:bold;display:none;z-index:1001;max-width:80%;min-width:250px;text-align:center;transition:opacity .3s ease-in-out}
-.completed{color:#8e8e93}
-#export-import-sort-container{display:flex;justify-content:center;align-items:center}
-#sort-by-select{padding:12px 15px;font-size:1rem;border:1px solid #3a3a3c;border-radius:10px;background-color:#2c2c2e;color:#f5f5f5;appearance:none;-webkit-appearance:none;-moz-appearance:none;box-shadow:0 2px 4px rgba(0,0,0,0.5);transition:background-color 0.3s ease,border-color 0.3s ease;width:200px}
-#sort-by-select:hover{background-color:#3a3a3c;border-color:#007aff}
-#sort-by-select:focus{outline:none;background-color:#3a3a3c;border-color:#007aff;box-shadow:0 2px 6px rgba(0,122,255,.6)}
-/* Animation for task removal */
-.fade-out { opacity: 0; visibility: hidden; transition: opacity 10s ease-out, visibility 0s 10s; }
-.completed-task { background-color: #1d2d22; }
-.no-tasks-message {
-color:fff;
-display: flex;
-justify-content: center;
-background-color: #007aff;
-border: 1px solid #ccc;
-padding: 10px;
-margin-top: 20px;
-border-radius: 5px;
-font-size: 16px;
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background-color:var(--bg-color);color:var(--text-color);transition:.3s;font-size:var(--font-size-base);line-height:1.6}
+.container{max-width:1200px;margin:2rem auto;padding:1rem}
+.header{text-align:center;margin-bottom:2rem}
+.header h1{color:var(--heading-color);font-size:2.5rem;margin-bottom:1rem}
+.header p{color:var(--text-color);opacity:0.8;max-width:600px;margin:0 auto}
+.minifier-container{background-color:var(--container-bg);border-radius:12px;padding:1.5rem;box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+.textarea-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;margin-bottom:1rem}
+pre{margin:0;padding:1.25rem;background:var(--bg-color) !important;border-radius:8px;border:1px solid var(--border-color);width:100%;height:400px;overflow-y:auto;resize:none;padding:10px}
+code{font-size:0.95rem !important;line-height:1.5 !important;background:none !important;}
+[contenteditable="true"]{outline:none;white-space:pre-wrap !important;overflow-wrap:break-word !important}
+pre::-webkit-scrollbar{width:8px}
+pre::-webkit-scrollbar-track{background:var(--container-bg);border-radius:4px}
+pre::-webkit-scrollbar-thumb{background:var(--primary-color);border-radius:4px}
+pre::-webkit-scrollbar-thumb:hover{background:#357abd}
+.controls{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:1rem}
+h3{color:var(--heading-color);margin-bottom:2rem;font-size:1.25rem}
+.checkbox-container{display:flex;align-items:center;gap:0.75rem;margin-right:1rem;background:var(--bg-color);padding:0.5rem 1rem;border-radius:6px;border:1px solid var(--border-color)}
+button{background:var(--primary-color);color:white;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;transition:all 0.2s}
+button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(74,144,226,0.2)}
+.darkmode-toggle{position:fixed;top:1.5rem;right:1.5rem;z-index:99;}
+.darkmode-toggle-container{width:60px;height:30px;position:relative;display:block;background:#ebebeb;border-radius:30px;box-shadow:inset 0 2px 6px rgba(0,0,0,0.4),inset 0 -2px 6px rgba(255,255,255,0.4);cursor:pointer}
+.darkmode-toggle-container:after{content:"";width:24px;height:24px;position:absolute;top:3px;left:3px;background:linear-gradient(180deg,#ffcc89,#d8860b);border-radius:50%;transition:.3s;box-shadow:0 2px 4px rgba(0,0,0,0.2)}
+.darkmode-toggle-container svg{position:absolute;width:16px;height:16px;top:7px;z-index:1}
+.darkmode-toggle-container svg.sun{left:6px;fill:#ffffff;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.5))}
+.darkmode-toggle-container svg.moon{right:6px;fill:#7e7e7e}
+.darkmode-toggle input{width:0;height:0;visibility:hidden}
+.darkmode-toggle input:checked + .darkmode-toggle-container{background:#242424}
+.darkmode-toggle input:checked + .darkmode-toggle-container:after{left:calc(100% - 27px);background:linear-gradient(180deg,#777,#3a3a3a)}
+.output-controls{display:flex;justify-content:space-between;align-items:center;margin-top:1rem}
+.controls-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:-0.5rem;flex-wrap:wrap;gap:1rem;}
+.controls-group{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;}
+footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--border-color);color:var(--text-color);opacity:0.8}
+.github-link{display:inline-flex;align-items:center;gap:0.75rem;color:var(--text-color);text-decoration:none;margin-left:1rem;padding:0.5rem 1rem;border-radius:6px;transition:.3s}
+.github-link:hover{background:rgba(74,144,226,0.1)}
+.token.string,.token.number{color:#a6e22e !important}
+.token.comment{color:#75715e !important}
+@media (max-width:768px){
+.container{margin:1rem;padding:0.5rem}
+.header h1{font-size:2rem}
+.minifier-container{padding:1.5rem}
+.controls-header{flex-direction:column;align-items:flex-start;}
+.controls-group{width:100%;justify-content:space-between;}
+.checkbox-container{margin-right:0;width:auto;}
 }
-
-.no-tasks-message i {
-margin-right: 10px;
-font-size: 20px;
+@media (max-width:480px){
+.controls-group{display: flex;align-items: stretch;flex-wrap: nowrap;margin-bottom: 20px;}
+.checkbox-container,#copy-button{width:100%;justify-content:center;}
+#copy-button{padding:0.75rem;}
+h3{margin-bottom: 0%;}
 }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="darkmode-toggle">
+            <input type="checkbox" id="darkmode-toggle"/>
+            <label for="darkmode-toggle" class="darkmode-toggle-container">
+                <svg xmlns="http://www.w3.org/2000/svg" class="sun" viewBox="0 0 24 24">
+                    <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-18a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V2a1 1 0 0 1 1-1zm0 18a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1zM2 12a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1zm18 0a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2h-2a1 1 0 0 1-1-1zM5.6 5.6a1 1 0 0 1 0-1.4l1.4-1.4a1 1 0 1 1 1.4 1.4L7 5.6a1 1 0 0 1-1.4 0zm12.8 12.8a1 1 0 0 1 0-1.4l1.4-1.4a1 1 0 0 1 1.4 1.4l-1.4 1.4a1 1 0 0 1-1.4 0zM5.6 18.4a1 1 0 0 1-1.4 0l-1.4-1.4a1 1 0 0 1 1.4-1.4l1.4 1.4a1 1 0 0 1 0 1.4zM18.4 5.6a1 1 0 0 1-1.4 0l-1.4-1.4a1 1 0 0 1 1.4-1.4l1.4 1.4a1 1 0 0 1 0 1.4z"/>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="moon" viewBox="0 0 24 24">
+                    <path d="M12.1 22c-5.5 0-10-4.5-10-10s4.5-10 10-10c.2 0 .5 0 .7.1-1.8 1.5-3 3.8-3 6.3 0 4.4 3.6 8 8 8 .6 0 1.1-.1 1.7-.2.2.5.3 1.1.3 1.8 0 2.2-1.8 4-4 4zm0-18c-4.4 0-8 3.6-8 8s3.6 8 8 8c.9 0 1.8-.2 2.6-.5-3.4-.9-6-4-6-7.7 0-3.5 2.3-6.5 5.4-7.5-.6-.2-1.3-.3-2-.3z"/>
+                </svg>
+            </label>
+        </div>
 
-/* Caution message style */
-.caution-message {
-color: #ffcc00;
-background-color: #2c2c2e;
-padding: 15px;
-margin-bottom: 15px;
-border-radius: 10px;
-font-size: 1rem;
-border: 1px solid #ffaa00;
-text-align: center;
-font-weight: bold;
-line-height: 1.5;
-}
+        <header class="header">
+            <h1>CSS Minifier</h1>
+            <p>A powerful tool to minimize your CSS code by removing unnecessary characters without changing its functionality.</p>
+        </header>
 
-/* Style for the error alert */
-.error-message {
-background-color: rgba(248, 215, 218, 0.9); /* Slightly transparent for blur effect */
-color: #721c24;
-border: 1px solid #f5c6cb;
-padding: 15px;
-margin-top: 10px;
-border-radius: 5px;
-font-size: 14px;
-display: none; /* Hidden by default */
-width: 100%;
-max-width: 400px;
-text-align: center;
-margin: 20px auto;
-box-sizing: border-box;
+        <div class="minifier-container">
+            <div class="textarea-container">
+    <div>
+        <h3>Input CSS</h3>
+        <pre><code class="language-css" id="css-input" contenteditable="true" spellcheck="false">/* Paste your CSS code here */
+            .example-class {
+                color: #333;
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            /* Another section */
+            .another-class {
+                background: #fff;
+                border: 1px solid #ddd;
+            }</code></pre>
+    </div>
+    <div>
+        <div class="controls-header">
+            <h3>Minified Output</h3>
+            <div class="controls-group">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="remove-comments">
+                    <label for="remove-comments">Remove comments</label>
+                </div>
+                <button id="copy-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                        <path d="M9.5 1H4a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h5.5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
+                    </svg>
+                    Copy
+                </button>
+            </div>
+        </div>
+        <pre><code class="language-css" id="css-output" readonly></code></pre>
+    </div>
+</div>
+        </div>
 
-/* Z-index to ensure it's above other content */
-position: fixed; /* Fixes the error message in the viewport */
-top: 10%; /* You can adjust this value to control vertical positioning */
-left: 50%; /* Centers the message horizontally */
-transform: translateX(-50%); /* Ensures perfect centering */
-z-index: 9999; /* Ensures it appears above all other elements */
+        <footer>
+            Made with ❤️ by Sayfullah
+            <a href="https://github.com/ssayeb7/MINIFI-CSS/" class="github-link" target="_blank" rel="noopener noreferrer">
+                <svg height="24" viewBox="0 0 16 16" width="24">
+                    <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                GitHub
+            </a>
+        </footer>
+    </div>
 
-/* Fade-out transition */
-opacity: 1;
-transition: opacity 0.3s ease-out;
-}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const darkModePreference = localStorage.getItem('darkMode') === 'true';
+            const darkModeToggle = document.getElementById('darkmode-toggle');
+            darkModeToggle.checked = darkModePreference;
+            document.body.classList.toggle('dark-mode', darkModePreference);
 
-/* Style for error message when it's visible */
-.error-message.show {
-display: block;
-opacity: 1;
-}
+            darkModeToggle.addEventListener('change', (e) => {
+                document.body.classList.toggle('dark-mode', e.target.checked);
+                localStorage.setItem('darkMode', e.target.checked);
+            });
 
-/* Style for error message when it's hidden */
-.error-message.hide {
-opacity: 0;
-display: none;
-}
+            document.getElementById('remove-comments').addEventListener('change', function() {
+                minifyCSS();
+            });
+
+            let debounceTimer;
+            const inputElement = document.getElementById('css-input');
+            
+            inputElement.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    minifyCSS();
+                }, 300);
+            });
+
+            document.getElementById('copy-button').addEventListener('click', async function() {
+                const copyBtn = document.getElementById('copy-button');
+                const outputText = document.getElementById('css-output').textContent;
+
+                try {
+                    await navigator.clipboard.writeText(outputText);
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Copied!';
+                    copyBtn.style.backgroundColor = '#28a745';
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                        copyBtn.style.backgroundColor = '';
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text:', err);
+                    copyBtn.textContent = 'Failed to copy';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                    }, 2000);
+                }
+            });
+
+            function minifyCSS() {
+                const input = inputElement.textContent;
+                const removeComments = document.getElementById('remove-comments').checked;
+                let output = input;
+
+                try {
+                    if (removeComments) {
+                        output = output.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+                    }
+
+                    output = output
+                        .replace(/\s*([{}:;,])\s*/g, '$1')
+                        .replace(/;}/g, '}')
+                        .replace(/\s+/g, ' ')
+                        .replace(/\s*{\s*/g, '{')
+                        .trim()
+                        .replace(/}\s*/g, '}\n')
+                        .replace(/@media[^{]+\{/g, match => match.trim() + '\n')
+                        .replace(/}\n\s+/g, '}\n')
+                        .replace(/^\s*[\r\n]/gm, '')
+                        .replace(/([^}])\s*{/g, '$1{');
+
+                    output = output
+                        .split('\n')
+                        .map(line => line.trim())
+                        .filter(line => line.length > 0)
+                        .join('\n');
+
+                    document.getElementById('css-output').textContent = output;
+                    Prism.highlightElement(document.getElementById('css-output'));
+                } catch (error) {
+                    console.error('Minification error:', error);
+                    document.getElementById('css-output').textContent = 'Error occurred during minification';
+                }
+            }
+
+            // Initial minification
+            minifyCSS();
+            Prism.highlightElement(inputElement);
+        });
+    </script>
+</body>
+</html>
