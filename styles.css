@@ -1,10 +1,6 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Arial',sans-serif;background-color:#1c1c1e;color:#f5f5f5;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh}
-h1{font-size:2rem;text-align:center;margin:20px 0}
-h1 a{text-decoration:none;color:#007bff;display:flex;align-items:center;justify-content:center;gap:10px;transition:color .3s ease}
-h1 a:hover{color:#ffffff}
-h1 a i{font-size:1.5rem;color:#007bff;transition:color .3s ease}
-h1 a:hover i{color:#ffffff}
+h1{font-size:2rem;text-align:center;margin:20px 0}h1 a{text-decoration:none;color:#007bff;display:flex;align-items:center;justify-content:center;gap:10px;transition:color .3s ease}h1 a:hover{color:#ffffff}h1 a i{font-size:1.5rem;color:#007bff;transition:color .3s ease}h1 a:hover i{color:#ffffff}
 #todo-form{display:flex;justify-content:center;margin-bottom:20px;width:100%;max-width:500px}
 #todo-form input{flex:1;padding:12px 15px;font-size:1rem;border:1px solid #3a3a3c;border-radius:10px;background-color:#2c2c2e;color:#f5f5f5;box-shadow:0 2px 4px rgba(0,0,0,0.5)}
 #todo-form button{padding:12px 20px;font-size:1rem;margin-left:10px;border:none;border-radius:10px;cursor:pointer;background-color:#007aff;color:#fff;transition:background-color 0.3s ease;box-shadow:0 2px 4px rgba(0,0,0,0.5)}
@@ -27,7 +23,7 @@ li.completed span{text-decoration:line-through;color:#8e8e93}
 .delete-btn{background-color:#ff3b30;color:#fff}
 .delete-btn:hover{background-color:#c12a23}
 #edit-modal,#confirm-delete-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#2c2c2e;padding:30px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.5);display:none;z-index:1000;width:90%;max-width:400px}
-#edit-modal textarea,#edit-modal input{width:100%;padding:10px;margin-bottom:15px;border:1px solid #3a3a3c;border-radius:10px;background-color:#1c1c1e;color:#f5f5f5;font-size:1rem;max-block-size:100px;max-width:350px}
+#edit-modal textarea,#edit-modal input{width:100%;padding:10px;margin-bottom:15px;border:1px solid #3a3a3c;border-radius:10px;background-color:#1c1c1e;color:#f5f5f5;font-size:1rem;max-block-size: 100px;max-width: 350px;}
 #edit-modal button,#confirm-delete-modal button{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-size:1rem}
 #modal-options{display:flex;justify-content:center;gap:10px;margin-top:10px}
 #save-edit-btn{background-color:#34c759;color:#fff}
@@ -41,7 +37,7 @@ li.completed span{text-decoration:line-through;color:#8e8e93}
 #export-import-buttons button{padding:12px 20px;font-size:1rem;border:none;border-radius:10px;cursor:pointer;background-color:#007aff;color:#fff;margin:5px;transition:background-color 0.3s ease}
 #export-import-buttons button:hover{background-color:#005bb5}
 #import-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#2c2c2e;padding:30px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.5);display:none;z-index:1000;width:90%;max-width:400px}
-#import-modal textarea{width:100%;padding:10px;margin-bottom:15px;border:1px solid #3a3a3c;border-radius:10px;background-color:#1c1c1e;color:#f5f5f5;font-size:14px;max-block-size:100px;max-width:350px}
+#import-modal textarea{width:100%;padding:10px;margin-bottom:15px;border:1px solid #3a3a3c;border-radius:10px;background-color:#1c1c1e;color:#f5f5f5;font-size:14px;    max-block-size: 100px;max-width: 350px;}
 #import-modal button{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-size:1rem}
 #import-modal #import-save-btn{background-color:#34c759;color:#fff}
 #import-modal #import-save-btn:hover{background-color:#28a745}
@@ -53,11 +49,76 @@ li.completed span{text-decoration:line-through;color:#8e8e93}
 #sort-by-select{padding:12px 15px;font-size:1rem;border:1px solid #3a3a3c;border-radius:10px;background-color:#2c2c2e;color:#f5f5f5;appearance:none;-webkit-appearance:none;-moz-appearance:none;box-shadow:0 2px 4px rgba(0,0,0,0.5);transition:background-color 0.3s ease,border-color 0.3s ease;width:200px}
 #sort-by-select:hover{background-color:#3a3a3c;border-color:#007aff}
 #sort-by-select:focus{outline:none;background-color:#3a3a3c;border-color:#007aff;box-shadow:0 2px 6px rgba(0,122,255,.6)}
-.fade-out{opacity:0;visibility:hidden;transition:opacity 10s ease-out,visibility 0s 10s}
-.completed-task{background-color:#1d2d22}
-.no-tasks-message{color:fff;display:flex;justify-content:center;background-color:#007aff;border:1px solid #ccc;padding:10px;margin-top:20px;border-radius:5px;font-size:16px}
-.no-tasks-message i{margin-right:10px;font-size:20px}
-.caution-message{color:#ffcc00;background-color:#2c2c2e;padding:15px;margin-bottom:15px;border-radius:10px;font-size:1rem;border:1px solid #ffaa00;text-align:center;font-weight:bold;line-height:1.5}
-.error-message{background-color:rgba(248,215,218,0.9);color:#721c24;border:1px solid #f5c6cb;padding:15px;margin-top:10px;border-radius:5px;font-size:14px;display:none;width:100%;max-width:400px;text-align:center;margin:20px auto;box-sizing:border-box;position:fixed;top:10%;left:50%;transform:translateX(-50%);z-index:9999;opacity:1;transition:opacity 0.3s ease-out}
-.error-message.show{display:block;opacity:1}
-.error-message.hide{opacity:0;display:none}
+/* Animation for task removal */
+.fade-out { opacity: 0; visibility: hidden; transition: opacity 10s ease-out, visibility 0s 10s; }
+.completed-task { background-color: #1d2d22; }
+.no-tasks-message {
+color:fff;
+display: flex;
+justify-content: center;
+background-color: #007aff;
+border: 1px solid #ccc;
+padding: 10px;
+margin-top: 20px;
+border-radius: 5px;
+font-size: 16px;
+}
+
+.no-tasks-message i {
+margin-right: 10px;
+font-size: 20px;
+}
+
+/* Caution message style */
+.caution-message {
+color: #ffcc00;
+background-color: #2c2c2e;
+padding: 15px;
+margin-bottom: 15px;
+border-radius: 10px;
+font-size: 1rem;
+border: 1px solid #ffaa00;
+text-align: center;
+font-weight: bold;
+line-height: 1.5;
+}
+
+/* Style for the error alert */
+.error-message {
+background-color: rgba(248, 215, 218, 0.9); /* Slightly transparent for blur effect */
+color: #721c24;
+border: 1px solid #f5c6cb;
+padding: 15px;
+margin-top: 10px;
+border-radius: 5px;
+font-size: 14px;
+display: none; /* Hidden by default */
+width: 100%;
+max-width: 400px;
+text-align: center;
+margin: 20px auto;
+box-sizing: border-box;
+
+/* Z-index to ensure it's above other content */
+position: fixed; /* Fixes the error message in the viewport */
+top: 10%; /* You can adjust this value to control vertical positioning */
+left: 50%; /* Centers the message horizontally */
+transform: translateX(-50%); /* Ensures perfect centering */
+z-index: 9999; /* Ensures it appears above all other elements */
+
+/* Fade-out transition */
+opacity: 1;
+transition: opacity 0.3s ease-out;
+}
+
+/* Style for error message when it's visible */
+.error-message.show {
+display: block;
+opacity: 1;
+}
+
+/* Style for error message when it's hidden */
+.error-message.hide {
+opacity: 0;
+display: none;
+}
